@@ -1,0 +1,431 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 10002025,
+    "identityHash": "dc8cd75a7a2c464a6a6980453a8bbb21",
+    "entities": [
+      {
+        "tableName": "new_pantone_colors1",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `hex_code` TEXT NOT NULL, `base_color1` TEXT NOT NULL, `percent_color1` REAL NOT NULL, `base_color2` TEXT NOT NULL, `percent_color2` REAL NOT NULL, `description` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hexCode",
+            "columnName": "hex_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor1",
+            "columnName": "base_color1",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor1",
+            "columnName": "percent_color1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor2",
+            "columnName": "base_color2",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor2",
+            "columnName": "percent_color2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "new_pantone_colors2",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `hex_code` TEXT NOT NULL, `base_color1` TEXT NOT NULL, `percent_color1` REAL NOT NULL, `base_color2` TEXT NOT NULL, `percent_color2` REAL NOT NULL, `base_color3` TEXT NOT NULL, `percent_color3` REAL NOT NULL, `description` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hexCode",
+            "columnName": "hex_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor1",
+            "columnName": "base_color1",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor1",
+            "columnName": "percent_color1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor2",
+            "columnName": "base_color2",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor2",
+            "columnName": "percent_color2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor3",
+            "columnName": "base_color3",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor3",
+            "columnName": "percent_color3",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "new_pantone_colors3",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `hex_code` TEXT NOT NULL, `base_color1` TEXT NOT NULL, `percent_color1` REAL NOT NULL, `base_color2` TEXT NOT NULL, `percent_color2` REAL NOT NULL, `base_color3` TEXT NOT NULL, `percent_color3` REAL NOT NULL, `base_color4` TEXT NOT NULL, `percent_color4` REAL NOT NULL, `description` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hexCode",
+            "columnName": "hex_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor1",
+            "columnName": "base_color1",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor1",
+            "columnName": "percent_color1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor2",
+            "columnName": "base_color2",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor2",
+            "columnName": "percent_color2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor3",
+            "columnName": "base_color3",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor3",
+            "columnName": "percent_color3",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor4",
+            "columnName": "base_color4",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor4",
+            "columnName": "percent_color4",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "flexo_color_palette",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `hex_code` TEXT NOT NULL, `base_color1` TEXT NOT NULL, `percent_color1` REAL NOT NULL, `base_color2` TEXT NOT NULL, `percent_color2` REAL NOT NULL, `base_color3` TEXT, `percent_color3` REAL, `base_color4` TEXT, `percent_color4` REAL, `anilox` TEXT, `description` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hexCode",
+            "columnName": "hex_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor1",
+            "columnName": "base_color1",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor1",
+            "columnName": "percent_color1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor2",
+            "columnName": "base_color2",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor2",
+            "columnName": "percent_color2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor3",
+            "columnName": "base_color3",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "percentColor3",
+            "columnName": "percent_color3",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "baseColor4",
+            "columnName": "base_color4",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "percentColor4",
+            "columnName": "percent_color4",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "anilox",
+            "columnName": "anilox",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "Castom_color_palette",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `hex_code` TEXT NOT NULL, `base_color1` TEXT NOT NULL, `percent_color1` REAL NOT NULL, `base_color2` TEXT NOT NULL, `percent_color2` REAL NOT NULL, `base_color3` TEXT, `percent_color3` REAL, `base_color4` TEXT, `percent_color4` REAL, `description` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hexCode",
+            "columnName": "hex_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor1",
+            "columnName": "base_color1",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor1",
+            "columnName": "percent_color1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor2",
+            "columnName": "base_color2",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentColor2",
+            "columnName": "percent_color2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseColor3",
+            "columnName": "base_color3",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "percentColor3",
+            "columnName": "percent_color3",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "baseColor4",
+            "columnName": "base_color4",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "percentColor4",
+            "columnName": "percent_color4",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "ink_library",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `manufacturer` TEXT NOT NULL, `name` TEXT NOT NULL, `ink_code` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "manufacturer",
+            "columnName": "manufacturer",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ink_code",
+            "columnName": "ink_code",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ink_library_manufacturer_name_ink_code",
+            "unique": true,
+            "columnNames": [
+              "manufacturer",
+              "name",
+              "ink_code"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ink_library_manufacturer_name_ink_code` ON `${TABLE_NAME}` (`manufacturer`, `name`, `ink_code`)"
+          }
+        ]
+      },
+      {
+        "tableName": "anilox_flex",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `volume` REAL, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "volume",
+            "columnName": "volume",
+            "affinity": "REAL"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dc8cd75a7a2c464a6a6980453a8bbb21')"
+    ]
+  }
+}
