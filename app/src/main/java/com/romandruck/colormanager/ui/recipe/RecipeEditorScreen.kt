@@ -45,8 +45,12 @@ import com.romandruck.colormanager.data.AniloxFlex
 import com.romandruck.colormanager.data.CustomRecipe
 import com.romandruck.colormanager.data.RecipeType
 import com.romandruck.colormanager.ui.inklibrary.InkLibraryViewModel
+import java.util.Locale
 
-
+enum class RecipeInputMode {
+    PERCENT,
+    MASS
+}
 
 @Composable
 fun RecipeEditorScreen(
@@ -58,43 +62,38 @@ fun RecipeEditorScreen(
     onSaved: () -> Unit
 ) {
 
+    val isEditMode = recipe != null
+
     // ============================================================
     // MODE
     // ============================================================
 
-    val isEditMode = recipe != null
-
+    var inputMode by remember(recipe) {
+        mutableStateOf(RecipeInputMode.PERCENT)
+    }
 
     // ============================================================
     // NAME
     // ============================================================
 
     var name by remember(recipe) {
-        mutableStateOf(
-            recipe?.name ?: ""
-        )
+        mutableStateOf(recipe?.name ?: "")
     }
-
 
     // ============================================================
     // HEX
     // ============================================================
 
     var hexCode by remember(recipe) {
-        mutableStateOf(
-            recipe?.hexCode ?: "#FFFFFF"
-        )
+        mutableStateOf(recipe?.hexCode ?: "#FFFFFF")
     }
-
 
     // ============================================================
     // BASE COLOR 1
     // ============================================================
 
     var baseColor1 by remember(recipe) {
-        mutableStateOf(
-            recipe?.baseColor1 ?: ""
-        )
+        mutableStateOf(recipe?.baseColor1 ?: "")
     }
 
     var percentColor1 by remember(recipe) {
@@ -105,15 +104,12 @@ fun RecipeEditorScreen(
         )
     }
 
-
     // ============================================================
     // BASE COLOR 2
     // ============================================================
 
     var baseColor2 by remember(recipe) {
-        mutableStateOf(
-            recipe?.baseColor2 ?: ""
-        )
+        mutableStateOf(recipe?.baseColor2 ?: "")
     }
 
     var percentColor2 by remember(recipe) {
@@ -124,15 +120,12 @@ fun RecipeEditorScreen(
         )
     }
 
-
     // ============================================================
     // BASE COLOR 3
     // ============================================================
 
     var baseColor3 by remember(recipe) {
-        mutableStateOf(
-            recipe?.baseColor3 ?: ""
-        )
+        mutableStateOf(recipe?.baseColor3 ?: "")
     }
 
     var percentColor3 by remember(recipe) {
@@ -143,15 +136,12 @@ fun RecipeEditorScreen(
         )
     }
 
-
     // ============================================================
     // BASE COLOR 4
     // ============================================================
 
     var baseColor4 by remember(recipe) {
-        mutableStateOf(
-            recipe?.baseColor4 ?: ""
-        )
+        mutableStateOf(recipe?.baseColor4 ?: "")
     }
 
     var percentColor4 by remember(recipe) {
@@ -162,28 +152,41 @@ fun RecipeEditorScreen(
         )
     }
 
+    // ============================================================
+    // MASS
+    // ============================================================
+
+    var massColor1 by remember(recipe) {
+        mutableStateOf("")
+    }
+
+    var massColor2 by remember(recipe) {
+        mutableStateOf("")
+    }
+
+    var massColor3 by remember(recipe) {
+        mutableStateOf("")
+    }
+
+    var massColor4 by remember(recipe) {
+        mutableStateOf("")
+    }
 
     // ============================================================
     // ANILOX
     // ============================================================
 
     var anilox by remember(recipe) {
-        mutableStateOf(
-            recipe?.anilox ?: ""
-        )
+        mutableStateOf(recipe?.anilox ?: "")
     }
-
 
     // ============================================================
     // DESCRIPTION
     // ============================================================
 
     var description by remember(recipe) {
-        mutableStateOf(
-            recipe?.description ?: ""
-        )
+        mutableStateOf(recipe?.description ?: "")
     }
-
 
     // ============================================================
     // ERROR
@@ -195,7 +198,6 @@ fun RecipeEditorScreen(
 
     val error by viewModel.error.collectAsState()
 
-
     // ============================================================
     // COLOR PICKER
     // ============================================================
@@ -203,7 +205,6 @@ fun RecipeEditorScreen(
     var showColorPicker by remember {
         mutableStateOf(false)
     }
-
 
     // ============================================================
     // ANILOX DIALOG
@@ -213,89 +214,133 @@ fun RecipeEditorScreen(
         mutableStateOf(false)
     }
 
-
     // ============================================================
     // TYPE
     // ============================================================
 
     val typeName = when (recipeType) {
-
         RecipeType.FLEXO -> "FLEXO"
-
         RecipeType.OFFSET -> "ОФСЕТ"
     }
-
 
     // ============================================================
     // PREVIEW COLOR
     // ============================================================
 
     val previewColor = remember(hexCode) {
-
         try {
-
             Color(
-                android.graphics.Color.parseColor(
-                    hexCode
-                )
+                android.graphics.Color.parseColor(hexCode)
             )
-
         } catch (e: Exception) {
-
             Color.LightGray
         }
     }
-
 
     // ============================================================
     // PERCENTAGES
     // ============================================================
 
-    val p1 =
-        percentColor1
-            .replace(",", ".")
-            .toDoubleOrNull()
-            ?: 0.0
+    val p1 = percentColor1
+        .replace(",", ".")
+        .toDoubleOrNull()
+        ?: 0.0
 
-    val p2 =
-        percentColor2
-            .replace(",", ".")
-            .toDoubleOrNull()
-            ?: 0.0
+    val p2 = percentColor2
+        .replace(",", ".")
+        .toDoubleOrNull()
+        ?: 0.0
 
-    val p3 =
-        percentColor3
-            .replace(",", ".")
-            .toDoubleOrNull()
-            ?: 0.0
+    val p3 = percentColor3
+        .replace(",", ".")
+        .toDoubleOrNull()
+        ?: 0.0
 
-    val p4 =
-        percentColor4
-            .replace(",", ".")
-            .toDoubleOrNull()
-            ?: 0.0
+    val p4 = percentColor4
+        .replace(",", ".")
+        .toDoubleOrNull()
+        ?: 0.0
 
+    val totalPercent = p1 + p2 + p3 + p4
 
     // ============================================================
-    // TOTAL
+    // MASS
     // ============================================================
 
-    val totalPercent =
-        p1 + p2 + p3 + p4
+    val m1 = massColor1
+        .replace(",", ".")
+        .toDoubleOrNull()
+        ?: 0.0
 
+    val m2 = massColor2
+        .replace(",", ".")
+        .toDoubleOrNull()
+        ?: 0.0
+
+    val m3 = massColor3
+        .replace(",", ".")
+        .toDoubleOrNull()
+        ?: 0.0
+
+    val m4 = massColor4
+        .replace(",", ".")
+        .toDoubleOrNull()
+        ?: 0.0
+
+    val totalMass = m1 + m2 + m3 + m4
+
+    // ============================================================
+    // FINAL PERCENTAGES
+    // ============================================================
+
+    val finalP1 =
+        if (inputMode == RecipeInputMode.MASS && totalMass > 0.0) {
+            m1 / totalMass * 100.0
+        } else {
+            p1
+        }
+
+    val finalP2 =
+        if (inputMode == RecipeInputMode.MASS && totalMass > 0.0) {
+            m2 / totalMass * 100.0
+        } else {
+            p2
+        }
+
+    val finalP3 =
+        if (inputMode == RecipeInputMode.MASS && totalMass > 0.0) {
+            m3 / totalMass * 100.0
+        } else {
+            p3
+        }
+
+    val finalP4 =
+        if (inputMode == RecipeInputMode.MASS && totalMass > 0.0) {
+            m4 / totalMass * 100.0
+        } else {
+            p4
+        }
+
+    // ============================================================
+    // DISPLAY TOTAL
+    // ============================================================
+
+    val displayedTotal =
+        if (inputMode == RecipeInputMode.MASS) {
+            totalMass
+        } else {
+            totalPercent
+        }
 
     // ============================================================
     // ERROR FROM VIEWMODEL
     // ============================================================
 
     LaunchedEffect(error) {
-
         if (error != null) {
-
             localError = error
         }
     }
-
 
     // ============================================================
     // SCREEN
@@ -322,7 +367,6 @@ fun RecipeEditorScreen(
             OutlinedButton(
                 onClick = onBack
             ) {
-
                 Text("← Назад")
             }
 
@@ -331,24 +375,19 @@ fun RecipeEditorScreen(
             )
 
             Text(
-                text =
-                    if (isEditMode) {
-                        "Изменить рецепт"
-                    } else {
-                        "Новый рецепт"
-                    },
-
+                text = if (isEditMode) {
+                    "Изменить рецепт"
+                } else {
+                    "Новый рецепт"
+                },
                 fontSize = 24.sp,
-
                 fontWeight = FontWeight.Bold
             )
         }
 
-
         Spacer(
             modifier = Modifier.height(8.dp)
         )
-
 
         // ========================================================
         // TYPE
@@ -356,52 +395,38 @@ fun RecipeEditorScreen(
 
         Text(
             text = typeName,
-
             fontSize = 16.sp,
-
             fontWeight = FontWeight.Bold,
-
             color = MaterialTheme.colorScheme.primary
         )
-
 
         Spacer(
             modifier = Modifier.height(20.dp)
         )
-
 
         // ========================================================
         // NAME
         // ========================================================
 
         OutlinedTextField(
-
             value = name,
-
             onValueChange = {
-
                 name = it
                 localError = null
             },
-
             modifier = Modifier.fillMaxWidth(),
-
             label = {
                 Text("Название рецепта")
             },
-
             placeholder = {
                 Text("Например: Красный 032")
             },
-
             singleLine = true
         )
-
 
         Spacer(
             modifier = Modifier.height(20.dp)
         )
-
 
         // ========================================================
         // COLOR
@@ -409,76 +434,53 @@ fun RecipeEditorScreen(
 
         Text(
             text = "Цвет",
-
             fontSize = 18.sp,
-
             fontWeight = FontWeight.Bold
         )
-
 
         Spacer(
             modifier = Modifier.height(8.dp)
         )
 
-
         Row(
             modifier = Modifier.fillMaxWidth(),
-
-            verticalAlignment =
-                Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
             Box(
-
                 modifier = Modifier
                     .width(70.dp)
                     .height(55.dp)
-
                     .background(
                         color = previewColor,
-
-                        shape =
-                            RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp)
                     )
-
                     .border(
                         width = 1.dp,
-
                         color = Color.LightGray,
-
-                        shape =
-                            RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp)
                     )
-
                     .clickable {
-
                         showColorPicker = true
                     }
             )
-
 
             Spacer(
                 modifier = Modifier.width(12.dp)
             )
 
-
             OutlinedButton(
-
                 onClick = {
-
                     showColorPicker = true
                 }
             ) {
-
                 Text("Выбрать цвет")
             }
         }
 
-
         Spacer(
             modifier = Modifier.height(24.dp)
         )
-
 
         // ========================================================
         // RECIPE
@@ -486,184 +488,245 @@ fun RecipeEditorScreen(
 
         Text(
             text = "Состав рецепта",
-
             fontSize = 20.sp,
-
             fontWeight = FontWeight.Bold
         )
-
 
         Spacer(
             modifier = Modifier.height(12.dp)
         )
 
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            OutlinedButton(
+                onClick = {
+                    inputMode = RecipeInputMode.PERCENT
+                    localError = null
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("По процентам")
+            }
+
+            OutlinedButton(
+                onClick = {
+                    inputMode = RecipeInputMode.MASS
+                    localError = null
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("По массе")
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(12.dp)
+        )
 
         // ========================================================
         // COLOR 1
         // ========================================================
 
         RecipeEditorColorRow(
-
             number = 1,
-
             colorName = baseColor1,
-
-            percent = percentColor1,
-
+            value = if (inputMode == RecipeInputMode.PERCENT) {
+                percentColor1
+            } else {
+                massColor1
+            },
+            valueLabel = if (inputMode == RecipeInputMode.PERCENT) {
+                "%"
+            } else {
+                "г"
+            },
             inkLibraryViewModel = inkLibraryViewModel,
-
             onColorChange = {
-
                 baseColor1 = it
                 localError = null
             },
+            onValueChange = {
+                if (inputMode == RecipeInputMode.PERCENT) {
+                    percentColor1 = it
+                } else {
+                    massColor1 = it
+                }
 
-            onPercentChange = {
-
-                percentColor1 = it
                 localError = null
             }
         )
 
-
         Spacer(
             modifier = Modifier.height(10.dp)
         )
-
 
         // ========================================================
         // COLOR 2
         // ========================================================
 
         RecipeEditorColorRow(
-
             number = 2,
-
             colorName = baseColor2,
-
-            percent = percentColor2,
-
+            value = if (inputMode == RecipeInputMode.PERCENT) {
+                percentColor2
+            } else {
+                massColor2
+            },
+            valueLabel = if (inputMode == RecipeInputMode.PERCENT) {
+                "%"
+            } else {
+                "г"
+            },
             inkLibraryViewModel = inkLibraryViewModel,
-
             onColorChange = {
-
                 baseColor2 = it
                 localError = null
             },
+            onValueChange = {
+                if (inputMode == RecipeInputMode.PERCENT) {
+                    percentColor2 = it
+                } else {
+                    massColor2 = it
+                }
 
-            onPercentChange = {
-
-                percentColor2 = it
                 localError = null
             }
         )
 
-
         Spacer(
             modifier = Modifier.height(10.dp)
         )
-
 
         // ========================================================
         // COLOR 3
         // ========================================================
 
         RecipeEditorColorRow(
-
             number = 3,
-
             colorName = baseColor3,
-
-            percent = percentColor3,
-
+            value = if (inputMode == RecipeInputMode.PERCENT) {
+                percentColor3
+            } else {
+                massColor3
+            },
+            valueLabel = if (inputMode == RecipeInputMode.PERCENT) {
+                "%"
+            } else {
+                "г"
+            },
             inkLibraryViewModel = inkLibraryViewModel,
-
             onColorChange = {
-
                 baseColor3 = it
                 localError = null
             },
+            onValueChange = {
+                if (inputMode == RecipeInputMode.PERCENT) {
+                    percentColor3 = it
+                } else {
+                    massColor3 = it
+                }
 
-            onPercentChange = {
-
-                percentColor3 = it
                 localError = null
             }
         )
 
-
         Spacer(
             modifier = Modifier.height(10.dp)
         )
-
 
         // ========================================================
         // COLOR 4
         // ========================================================
 
         RecipeEditorColorRow(
-
             number = 4,
-
             colorName = baseColor4,
-
-            percent = percentColor4,
-
+            value = if (inputMode == RecipeInputMode.PERCENT) {
+                percentColor4
+            } else {
+                massColor4
+            },
+            valueLabel = if (inputMode == RecipeInputMode.PERCENT) {
+                "%"
+            } else {
+                "г"
+            },
             inkLibraryViewModel = inkLibraryViewModel,
-
             onColorChange = {
-
                 baseColor4 = it
                 localError = null
             },
+            onValueChange = {
+                if (inputMode == RecipeInputMode.PERCENT) {
+                    percentColor4 = it
+                } else {
+                    massColor4 = it
+                }
 
-            onPercentChange = {
-
-                percentColor4 = it
                 localError = null
             }
         )
 
-
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-
 
         // ========================================================
         // TOTAL
         // ========================================================
 
         Row(
-
             modifier = Modifier.fillMaxWidth(),
-
-            horizontalArrangement =
-                Arrangement.End
+            horizontalArrangement = Arrangement.End
         ) {
 
+            val totalIsValid =
+                if (inputMode == RecipeInputMode.PERCENT) {
+                    totalPercent > 0.0 && totalPercent <= 100.0
+                } else {
+                    totalMass > 0.0
+                }
+
             Text(
-
-                text =
-                    "Итого: " +
-                            "${formatEditorNumber(totalPercent)}%",
-
+                text = if (inputMode == RecipeInputMode.MASS) {
+                    "Итого: ${formatEditorNumber(displayedTotal)} г"
+                } else {
+                    "Итого: ${formatEditorNumber(displayedTotal)}%"
+                },
                 fontSize = 18.sp,
-
                 fontWeight = FontWeight.Bold,
-
-                color =
-                    if (totalPercent == 100.0) {
-
-                        Color(0xFF188038)
-
-                    } else {
-
-                        Color.DarkGray
-                    }
+                color = if (totalIsValid) {
+                    Color(0xFF188038)
+                } else {
+                    Color.DarkGray
+                }
             )
         }
 
+        // ========================================================
+        // PREVIEW PERCENTAGES IN MASS MODE
+        // ========================================================
+
+        if (inputMode == RecipeInputMode.MASS && totalMass > 0.0) {
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            Text(
+                text =
+                    "Проценты: " +
+                            "${formatEditorNumber(finalP1)}% / " +
+                            "${formatEditorNumber(finalP2)}% / " +
+                            "${formatEditorNumber(finalP3)}% / " +
+                            "${formatEditorNumber(finalP4)}%",
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
+        }
 
         // ========================================================
         // ANILOX FLEXO
@@ -677,9 +740,7 @@ fun RecipeEditorScreen(
 
             Text(
                 text = "Анилокс",
-
                 fontSize = 18.sp,
-
                 fontWeight = FontWeight.Bold
             )
 
@@ -689,94 +750,67 @@ fun RecipeEditorScreen(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-
-                verticalAlignment =
-                    Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
                 OutlinedTextField(
-
                     value = anilox,
-
                     onValueChange = {
-
                         anilox = it
                         localError = null
                     },
-
-                    modifier =
-                        Modifier.weight(1f),
-
+                    modifier = Modifier.weight(1f),
                     label = {
                         Text("Анилокс")
                     },
-
                     placeholder = {
                         Text("Например: 120 l/cm")
                     },
-
                     singleLine = true
                 )
-
 
                 Spacer(
                     modifier = Modifier.width(8.dp)
                 )
 
-
                 OutlinedButton(
-
                     onClick = {
-
                         showAniloxDialog = true
                     }
                 ) {
-
                     Text("Выбрать")
                 }
             }
         }
 
-
         Spacer(
             modifier = Modifier.height(20.dp)
         )
-
 
         // ========================================================
         // DESCRIPTION
         // ========================================================
 
         OutlinedTextField(
-
             value = description,
-
             onValueChange = {
-
                 description = it
                 localError = null
             },
-
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp),
-
             label = {
                 Text("Описание")
             },
-
             placeholder = {
-                Text(
-                    "Дополнительная информация"
-                )
+                Text("Дополнительная информация")
             }
         )
-
 
         Spacer(
             modifier = Modifier.height(16.dp)
         )
-
 
         // ========================================================
         // ERROR
@@ -785,28 +819,20 @@ fun RecipeEditorScreen(
         if (localError != null) {
 
             Text(
-
                 text = localError!!,
-
-                color =
-                    MaterialTheme.colorScheme.error,
-
+                color = MaterialTheme.colorScheme.error,
                 fontSize = 14.sp,
-
-                modifier =
-                    Modifier.padding(
-                        bottom = 12.dp
-                    )
+                modifier = Modifier.padding(
+                    bottom = 12.dp
+                )
             )
         }
-
 
         // ========================================================
         // SAVE
         // ========================================================
 
         Button(
-
             onClick = {
 
                 // ==================================================
@@ -821,7 +847,6 @@ fun RecipeEditorScreen(
                     return@Button
                 }
 
-
                 if (hexCode.isBlank()) {
 
                     localError =
@@ -830,13 +855,13 @@ fun RecipeEditorScreen(
                     return@Button
                 }
 
+                val hasColor =
+                    baseColor1.isNotBlank() ||
+                            baseColor2.isNotBlank() ||
+                            baseColor3.isNotBlank() ||
+                            baseColor4.isNotBlank()
 
-                if (
-                    baseColor1.isBlank() &&
-                    baseColor2.isBlank() &&
-                    baseColor3.isBlank() &&
-                    baseColor4.isBlank()
-                ) {
+                if (!hasColor) {
 
                     localError =
                         "Добавьте хотя бы один базовый цвет"
@@ -844,24 +869,43 @@ fun RecipeEditorScreen(
                     return@Button
                 }
 
+                // ==================================================
+                // PERCENT MODE VALIDATION
+                // ==================================================
 
-                if (totalPercent <= 0.0) {
+                if (inputMode == RecipeInputMode.PERCENT) {
 
-                    localError =
-                        "Сумма процентов должна быть больше 0"
+                    if (totalPercent <= 0.0) {
 
-                    return@Button
+                        localError =
+                            "Сумма процентов должна быть больше 0"
+
+                        return@Button
+                    }
+
+                    if (totalPercent > 100.0) {
+
+                        localError =
+                            "Сумма процентов не может быть больше 100%"
+
+                        return@Button
+                    }
                 }
 
+                // ==================================================
+                // MASS MODE VALIDATION
+                // ==================================================
 
-                if (totalPercent > 100.0) {
+                if (inputMode == RecipeInputMode.MASS) {
 
-                    localError =
-                        "Сумма процентов не может быть больше 100%"
+                    if (totalMass <= 0.0) {
 
-                    return@Button
+                        localError =
+                            "Общая масса должна быть больше 0 г"
+
+                        return@Button
+                    }
                 }
-
 
                 // ==================================================
                 // CREATE RECIPE
@@ -875,15 +919,31 @@ fun RecipeEditorScreen(
 
                     type = recipeType,
 
-                    baseColor1 =
-                        baseColor1.trim(),
+                    baseColor1 = baseColor1
+                        .trim()
+                        .ifBlank {
+                            ""
+                        },
 
-                    percentColor1 = p1,
+                    percentColor1 =
+                        if (baseColor1.isBlank()) {
+                            0.0
+                        } else {
+                            finalP1
+                        },
 
-                    baseColor2 =
-                        baseColor2.trim(),
+                    baseColor2 = baseColor2
+                        .trim()
+                        .ifBlank {
+                            ""
+                        },
 
-                    percentColor2 = p2,
+                    percentColor2 =
+                        if (baseColor2.isBlank()) {
+                            0.0
+                        } else {
+                            finalP2
+                        },
 
                     baseColor3 =
                         baseColor3
@@ -893,15 +953,10 @@ fun RecipeEditorScreen(
                             },
 
                     percentColor3 =
-                        if (
-                            baseColor3.isBlank()
-                        ) {
-
+                        if (baseColor3.isBlank()) {
                             null
-
                         } else {
-
-                            p3
+                            finalP3
                         },
 
                     baseColor4 =
@@ -912,26 +967,18 @@ fun RecipeEditorScreen(
                             },
 
                     percentColor4 =
-                        if (
-                            baseColor4.isBlank()
-                        ) {
-
+                        if (baseColor4.isBlank()) {
                             null
-
                         } else {
-
-                            p4
+                            finalP4
                         },
 
                     // ==================================================
                     // ANILOX
-                    // Только FLEXO
                     // ==================================================
 
                     anilox =
-                        if (
-                            recipeType == RecipeType.FLEXO
-                        ) {
+                        if (recipeType == RecipeType.FLEXO) {
 
                             anilox
                                 .trim()
@@ -944,6 +991,10 @@ fun RecipeEditorScreen(
                             null
                         },
 
+                    // ==================================================
+                    // DESCRIPTION
+                    // ==================================================
+
                     description =
                         description
                             .trim()
@@ -952,7 +1003,6 @@ fun RecipeEditorScreen(
                             }
                 )
 
-
                 // ==================================================
                 // ADD / UPDATE
                 // ==================================================
@@ -960,52 +1010,38 @@ fun RecipeEditorScreen(
                 if (isEditMode) {
 
                     viewModel.updateRecipe(
-
                         recipe = newRecipe,
-
                         onSuccess = onSaved
                     )
 
                 } else {
 
                     viewModel.addRecipe(
-
                         recipe = newRecipe,
-
                         onSuccess = onSaved
                     )
                 }
             },
-
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp)
         ) {
 
             Text(
-
-                text =
-                    if (isEditMode) {
-
-                        "СОХРАНИТЬ ИЗМЕНЕНИЯ"
-
-                    } else {
-
-                        "СОХРАНИТЬ РЕЦЕПТ"
-                    },
-
+                text = if (isEditMode) {
+                    "СОХРАНИТЬ ИЗМЕНЕНИЯ"
+                } else {
+                    "СОХРАНИТЬ РЕЦЕПТ"
+                },
                 fontSize = 16.sp,
-
                 fontWeight = FontWeight.Bold
             )
         }
-
 
         Spacer(
             modifier = Modifier.height(24.dp)
         )
     }
-
 
     // ============================================================
     // COLOR PICKER
@@ -1014,7 +1050,6 @@ fun RecipeEditorScreen(
     if (showColorPicker) {
 
         ColorPickerDialog(
-
             initialColor = previewColor,
 
             onColorSelected = { color ->
@@ -1035,6 +1070,7 @@ fun RecipeEditorScreen(
                         .coerceIn(0, 255)
 
                 hexCode = String.format(
+                    Locale.US,
                     "#%02X%02X%02X",
                     red,
                     green,
@@ -1047,12 +1083,10 @@ fun RecipeEditorScreen(
             },
 
             onDismiss = {
-
                 showColorPicker = false
             }
         )
     }
-
 
     // ============================================================
     // ANILOX PICKER
@@ -1064,9 +1098,7 @@ fun RecipeEditorScreen(
     ) {
 
         AniloxPickerDialog(
-
             viewModel = viewModel,
-
             currentAnilox = anilox,
 
             onAniloxSelected = {
@@ -1079,13 +1111,11 @@ fun RecipeEditorScreen(
             },
 
             onDismiss = {
-
                 showAniloxDialog = false
             }
         )
     }
 }
-
 
 // =================================================================
 // COLOR ROW
@@ -1095,12 +1125,13 @@ fun RecipeEditorScreen(
 private fun RecipeEditorColorRow(
     number: Int,
     colorName: String,
-    percent: String,
+    value: String,
+    valueLabel: String,
 
     inkLibraryViewModel: InkLibraryViewModel,
 
     onColorChange: (String) -> Unit,
-    onPercentChange: (String) -> Unit
+    onValueChange: (String) -> Unit
 ) {
 
     val inks by
@@ -1125,13 +1156,13 @@ private fun RecipeEditorColorRow(
                         .lowercase()
                         .contains(query) ||
 
-                    ink.name
-                        .lowercase()
-                        .contains(query) ||
+                            ink.name
+                                .lowercase()
+                                .contains(query) ||
 
-                    ink.ink_code
-                        .lowercase()
-                        .contains(query)
+                            ink.ink_code
+                                .lowercase()
+                                .contains(query)
                 }
                 .take(5)
         }
@@ -1143,58 +1174,39 @@ private fun RecipeEditorColorRow(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-
-            verticalAlignment =
-                Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
             OutlinedTextField(
-
                 value = colorName,
-
                 onValueChange = onColorChange,
-
                 modifier = Modifier.weight(1f),
-
                 label = {
                     Text("Базовый цвет $number")
                 },
-
                 placeholder = {
                     Text("Например: White")
                 },
-
                 singleLine = true
             )
-
 
             Spacer(
                 modifier = Modifier.width(8.dp)
             )
 
-
             OutlinedTextField(
-
-                value = percent,
-
-                onValueChange = onPercentChange,
-
+                value = value,
+                onValueChange = onValueChange,
                 modifier = Modifier.width(95.dp),
-
                 label = {
-                    Text("%")
+                    Text(valueLabel)
                 },
-
-                keyboardOptions =
-                    KeyboardOptions(
-                        keyboardType =
-                            KeyboardType.Decimal
-                    ),
-
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal
+                ),
                 singleLine = true
             )
         }
-
 
         // =========================================================
         // INK LIBRARY SUGGESTIONS
@@ -1237,11 +1249,9 @@ private fun RecipeEditorColorRow(
                 filteredInks.forEach { ink ->
 
                     Row(
-
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-
                                 onColorChange(
                                     ink.name
                                 )
@@ -1250,7 +1260,6 @@ private fun RecipeEditorColorRow(
                                 horizontal = 8.dp,
                                 vertical = 8.dp
                             ),
-
                         verticalAlignment =
                             Alignment.CenterVertically
                     ) {
@@ -1270,11 +1279,8 @@ private fun RecipeEditorColorRow(
                             Text(
                                 text =
                                     "${ink.manufacturer} • ${ink.ink_code}",
-
                                 fontSize = 12.sp,
-
-                                color =
-                                    Color.Gray
+                                color = Color.Gray
                             )
                         }
                     }
@@ -1284,21 +1290,15 @@ private fun RecipeEditorColorRow(
     }
 }
 
-
-
 // =================================================================
 // ANILOX PICKER DIALOG
 // =================================================================
 
 @Composable
 private fun AniloxPickerDialog(
-
     viewModel: RecipeViewModel,
-
     currentAnilox: String,
-
     onAniloxSelected: (String) -> Unit,
-
     onDismiss: () -> Unit
 ) {
 
@@ -1306,10 +1306,8 @@ private fun AniloxPickerDialog(
         mutableStateOf("")
     }
 
-
     val aniloxRecipes by
         viewModel.aniloxRecipes.collectAsState()
-
 
     LaunchedEffect(searchText) {
 
@@ -1318,13 +1316,11 @@ private fun AniloxPickerDialog(
         )
     }
 
-
     AlertDialog(
 
         onDismissRequest = onDismiss,
 
         title = {
-
             Text(
                 text = "Выбор анилокс",
                 fontWeight = FontWeight.Bold
@@ -1337,73 +1333,42 @@ private fun AniloxPickerDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
 
-                // ==================================================
-                // SEARCH
-                // ==================================================
-
                 OutlinedTextField(
-
                     value = searchText,
-
                     onValueChange = {
-
                         searchText = it
                     },
-
-                    modifier =
-                        Modifier.fillMaxWidth(),
-
+                    modifier = Modifier.fillMaxWidth(),
                     label = {
                         Text("Поиск")
                     },
-
                     placeholder = {
                         Text("Например: 120")
                     },
-
                     singleLine = true
                 )
-
 
                 Spacer(
                     modifier = Modifier.height(12.dp)
                 )
 
-
-                // ==================================================
-                // CLEAR
-                // ==================================================
-
                 if (currentAnilox.isNotBlank()) {
 
                     OutlinedButton(
-
                         onClick = {
-
                             onAniloxSelected("")
                         },
-
-                        modifier =
-                            Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-
                         Text("Без анилокс")
                     }
 
-
                     Spacer(
-                        modifier =
-                            Modifier.height(8.dp)
+                        modifier = Modifier.height(8.dp)
                     )
                 }
 
-
-                // ==================================================
-                // LIST
-                // ==================================================
-
                 Column(
-
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp)
@@ -1412,27 +1377,15 @@ private fun AniloxPickerDialog(
                         )
                 ) {
 
-                    if (
-                        aniloxRecipes.isEmpty()
-                    ) {
+                    if (aniloxRecipes.isEmpty()) {
 
                         Text(
-
-                            text =
-                                "Анилокс не найден",
-
-                            color =
-                                Color.Gray,
-
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(
-                                        16.dp
-                                    ),
-
-                            textAlign =
-                                TextAlign.Center
+                            text = "Анилокс не найден",
+                            color = Color.Gray,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            textAlign = TextAlign.Center
                         )
 
                     } else {
@@ -1440,15 +1393,11 @@ private fun AniloxPickerDialog(
                         aniloxRecipes.forEach { item ->
 
                             AniloxItemRow(
-
                                 item = item,
-
                                 selected =
                                     item.name ==
                                             currentAnilox,
-
                                 onClick = {
-
                                     onAniloxSelected(
                                         item.name
                                     )
@@ -1465,13 +1414,11 @@ private fun AniloxPickerDialog(
             TextButton(
                 onClick = onDismiss
             ) {
-
                 Text("Закрыть")
             }
         }
     )
 }
-
 
 // =================================================================
 // ANILOX ITEM
@@ -1479,39 +1426,27 @@ private fun AniloxPickerDialog(
 
 @Composable
 private fun AniloxItemRow(
-
     item: AniloxFlex,
-
     selected: Boolean,
-
     onClick: () -> Unit
 ) {
 
     Row(
-
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
                 onClick = onClick
             )
             .background(
-
                 color =
                     if (selected) {
-
                         MaterialTheme
                             .colorScheme
                             .primaryContainer
-
                     } else {
-
                         Color.Transparent
                     },
-
-                shape =
-                    RoundedCornerShape(
-                        8.dp
-                    )
+                shape = RoundedCornerShape(8.dp)
             )
             .padding(12.dp),
 
@@ -1524,51 +1459,38 @@ private fun AniloxItemRow(
         ) {
 
             Text(
-
                 text = item.name,
-
                 fontSize = 16.sp,
-
-                fontWeight =
-                    FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
-
 
             if (item.volume != null) {
 
                 Text(
-
                     text =
-                        "${formatEditorNumber(item.volume)}",
-
+                        formatEditorNumber(
+                            item.volume
+                        ),
                     color = Color.Gray,
-
                     fontSize = 14.sp
                 )
             }
         }
 
-
         if (selected) {
 
             Text(
-
                 text = "✓",
-
                 color =
                     MaterialTheme
                         .colorScheme
                         .primary,
-
                 fontSize = 20.sp,
-
-                fontWeight =
-                    FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
         }
     }
 }
-
 
 // =================================================================
 // COLOR PICKER DIALOG
@@ -1576,199 +1498,126 @@ private fun AniloxItemRow(
 
 @Composable
 private fun ColorPickerDialog(
-
     initialColor: Color,
-
     onColorSelected: (Color) -> Unit,
-
     onDismiss: () -> Unit
 ) {
 
     var red by remember(initialColor) {
-
         mutableStateOf(
             (initialColor.red * 255)
                 .toInt()
+                .coerceIn(0, 255)
         )
     }
 
     var green by remember(initialColor) {
-
         mutableStateOf(
             (initialColor.green * 255)
                 .toInt()
+                .coerceIn(0, 255)
         )
     }
 
     var blue by remember(initialColor) {
-
         mutableStateOf(
             (initialColor.blue * 255)
                 .toInt()
+                .coerceIn(0, 255)
         )
     }
 
-
     val selectedColor = Color(
-
         red = red / 255f,
-
         green = green / 255f,
-
         blue = blue / 255f
     )
-
 
     AlertDialog(
 
         onDismissRequest = onDismiss,
 
         title = {
-
             Text(
-
                 text = "Выбор цвета",
-
-                fontWeight =
-                    FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
         },
 
         text = {
 
             Column(
-                modifier =
-                    Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
 
-                // =================================================
-                // PREVIEW
-                // =================================================
-
                 Box(
-
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp)
-
                         .background(
-
-                            color =
-                                selectedColor,
-
+                            color = selectedColor,
                             shape =
                                 RoundedCornerShape(
                                     10.dp
                                 )
                         )
-
                         .border(
-
                             width = 1.dp,
-
-                            color =
-                                Color.LightGray,
-
+                            color = Color.LightGray,
                             shape =
                                 RoundedCornerShape(
                                     10.dp
                                 )
                         )
                 )
-
 
                 Spacer(
-                    modifier =
-                        Modifier.height(20.dp)
+                    modifier = Modifier.height(20.dp)
                 )
 
-
-                // =================================================
-                // RED
-                // =================================================
-
                 ColorSliderRow(
-
                     title = "Красный",
-
                     value = red,
-
                     color = Color.Red,
-
                     onValueChange = {
-
                         red = it
                     }
                 )
 
-
-                // =================================================
-                // GREEN
-                // =================================================
-
                 ColorSliderRow(
-
                     title = "Зелёный",
-
                     value = green,
-
                     color = Color.Green,
-
                     onValueChange = {
-
                         green = it
                     }
                 )
 
-
-                // =================================================
-                // BLUE
-                // =================================================
-
                 ColorSliderRow(
-
                     title = "Синий",
-
                     value = blue,
-
                     color = Color.Blue,
-
                     onValueChange = {
-
                         blue = it
                     }
                 )
 
-
                 Spacer(
-                    modifier =
-                        Modifier.height(8.dp)
+                    modifier = Modifier.height(8.dp)
                 )
 
-
-                // =================================================
-                // HEX
-                // =================================================
-
                 Text(
-
                     text = String.format(
+                        Locale.US,
                         "#%02X%02X%02X",
                         red,
                         green,
                         blue
                     ),
-
                     fontSize = 18.sp,
-
-                    fontWeight =
-                        FontWeight.Bold,
-
-                    modifier =
-                        Modifier.fillMaxWidth(),
-
-                    textAlign =
-                        TextAlign.Center
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
             }
         },
@@ -1776,15 +1625,12 @@ private fun ColorPickerDialog(
         confirmButton = {
 
             Button(
-
                 onClick = {
-
                     onColorSelected(
                         selectedColor
                     )
                 }
             ) {
-
                 Text("Выбрать")
             }
         },
@@ -1794,13 +1640,11 @@ private fun ColorPickerDialog(
             TextButton(
                 onClick = onDismiss
             ) {
-
                 Text("Отмена")
             }
         }
     )
 }
-
 
 // =================================================================
 // COLOR SLIDER
@@ -1808,13 +1652,9 @@ private fun ColorPickerDialog(
 
 @Composable
 private fun ColorSliderRow(
-
     title: String,
-
     value: Int,
-
     color: Color,
-
     onValueChange: (Int) -> Unit
 ) {
 
@@ -1823,59 +1663,41 @@ private fun ColorSliderRow(
     ) {
 
         Row(
-
             modifier = Modifier.fillMaxWidth(),
-
             verticalAlignment =
                 Alignment.CenterVertically
         ) {
 
             Text(
-
                 text = title,
-
-                modifier =
-                    Modifier.weight(1f),
-
-                fontWeight =
-                    FontWeight.Bold
+                modifier = Modifier.weight(1f),
+                fontWeight = FontWeight.Bold
             )
 
-
             Text(
-
                 text = value.toString(),
-
-                fontWeight =
-                    FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
         }
 
-
         Slider(
-
             value = value.toFloat(),
 
             onValueChange = {
-
                 onValueChange(
-                    it.toInt()
+                    it.toInt().coerceIn(0, 255)
                 )
             },
 
             valueRange = 0f..255f,
 
-            colors =
-                SliderDefaults.colors(
-
-                    thumbColor = color,
-
-                    activeTrackColor = color
-                )
+            colors = SliderDefaults.colors(
+                thumbColor = color,
+                activeTrackColor = color
+            )
         )
     }
 }
-
 
 // =================================================================
 // FORMAT NUMBER
@@ -1892,7 +1714,7 @@ private fun formatEditorNumber(
     } else {
 
         String.format(
-            java.util.Locale.US,
+            Locale.US,
             "%.3f",
             value
         )

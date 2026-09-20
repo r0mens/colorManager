@@ -1,3 +1,4 @@
+
 package com.romandruck.colormanager
 
 import android.os.Bundle
@@ -8,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,18 +24,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.text.KeyboardOptions
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Tab
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.FilterChip
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -60,6 +61,10 @@ import com.romandruck.colormanager.data.PantoneRepository
 import com.romandruck.colormanager.data.RecipeRepository
 import com.romandruck.colormanager.data.RecipeType
 
+import com.romandruck.colormanager.ui.anilox.AniloxFlexScreen
+import com.romandruck.colormanager.ui.anilox.AniloxFlexViewModel
+import com.romandruck.colormanager.ui.anilox.AniloxFlexViewModelFactory
+
 import com.romandruck.colormanager.ui.inklibrary.InkLibraryScreen
 import com.romandruck.colormanager.ui.inklibrary.InkLibraryViewModel
 import com.romandruck.colormanager.ui.inklibrary.InkLibraryViewModelFactory
@@ -72,11 +77,6 @@ import com.romandruck.colormanager.ui.recipe.RecipeViewModel
 import com.romandruck.colormanager.ui.recipe.RecipeViewModelFactory
 
 import com.romandruck.colormanager.ui.theme.ColorManagerTheme
-import com.romandruck.colormanager.ui.anilox.AniloxFlexScreen
-import com.romandruck.colormanager.ui.anilox.AniloxFlexViewModel
-import com.romandruck.colormanager.ui.anilox.AniloxFlexViewModelFactory
-import com.romandruck.colormanager.ui.camera.LabTestScreen
-
 
 
 class MainActivity : ComponentActivity() {
@@ -91,10 +91,6 @@ class MainActivity : ComponentActivity() {
 
             ColorManagerTheme {
 
-                // =================================================
-                // DATABASE
-                // =================================================
-
                 val database = remember {
 
                     PantoneDatabase.getInstance(
@@ -102,22 +98,10 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-
-                // =================================================
-                // PANTONE REPOSITORY
-                // =================================================
-
                 val pantoneRepository = remember {
 
-                    PantoneRepository(
-                        database
-                    )
+                    PantoneRepository(database)
                 }
-
-
-                // =================================================
-                // PANTONE FACTORY
-                // =================================================
 
                 val pantoneFactory = remember {
 
@@ -126,32 +110,15 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-
-                // =================================================
-                // PANTONE VIEWMODEL
-                // =================================================
-
                 val pantoneViewModel: PantoneViewModel =
                     viewModel(
                         factory = pantoneFactory
                     )
 
-
-                // =================================================
-                // RECIPE REPOSITORY
-                // =================================================
-
                 val recipeRepository = remember {
 
-                    RecipeRepository(
-                        database
-                    )
+                    RecipeRepository(database)
                 }
-
-
-                // =================================================
-                // RECIPE FACTORY
-                // =================================================
 
                 val recipeFactory = remember {
 
@@ -160,20 +127,10 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-
-                // =================================================
-                // RECIPE VIEWMODEL
-                // =================================================
-
                 val recipeViewModel: RecipeViewModel =
                     viewModel(
                         factory = recipeFactory
                     )
-
-
-                // =================================================
-                // INK LIBRARY FACTORY
-                // =================================================
 
                 val inkLibraryFactory = remember {
 
@@ -182,27 +139,22 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-
-                // =================================================
-                // INK LIBRARY VIEWMODEL
-                // =================================================
-
                 val inkLibraryViewModel: InkLibraryViewModel =
                     viewModel(
                         factory = inkLibraryFactory
                     )
-                //==================================================
-                //ANILOX VIEWMODEL
-                //==================================================
+
                 val aniloxFlexFactory = remember {
-                    AniloxFlexViewModelFactory(recipeRepository)
+
+                    AniloxFlexViewModelFactory(
+                        recipeRepository
+                    )
                 }
-                val aniloxFlexViewModel: AniloxFlexViewModel = viewModel(factory = aniloxFlexFactory)
 
-
-                // =================================================
-                // APP
-                // =================================================
+                val aniloxFlexViewModel: AniloxFlexViewModel =
+                    viewModel(
+                        factory = aniloxFlexFactory
+                    )
 
                 PantoneApp(
 
@@ -210,16 +162,12 @@ class MainActivity : ComponentActivity() {
 
                     recipeViewModel = recipeViewModel,
 
-                    inkLibraryViewModel = inkLibraryViewModel,
+                    inkLibraryViewModel =
+                        inkLibraryViewModel,
 
-                    aniloxFlexViewModel = aniloxFlexViewModel
+                    aniloxFlexViewModel =
+                        aniloxFlexViewModel
                 )
-
-                 // =================================================
-                // LAB TEST
-                // =================================================
-
-                //LabTestScreen()
             }
         }
     }
@@ -242,49 +190,25 @@ fun PantoneApp(
     aniloxFlexViewModel: AniloxFlexViewModel
 ) {
 
-    // =========================================================
-    // SELECTED PANTONE
-    // =========================================================
-
     var selectedColor by remember {
 
         mutableStateOf<PantoneItem?>(null)
     }
-
-
-    // =========================================================
-    // SELECTED RECIPE
-    // =========================================================
 
     var selectedRecipe by remember {
 
         mutableStateOf<CustomRecipe?>(null)
     }
 
-
-    // =========================================================
-    // RECIPE TYPE
-    // =========================================================
-
     var selectedRecipeType by remember {
 
         mutableStateOf<RecipeType?>(null)
     }
 
-
-    // =========================================================
-    // RECIPE EDITOR
-    // =========================================================
-
     var isRecipeEditorOpen by remember {
 
         mutableStateOf(false)
     }
-
-
-    // =========================================================
-    // SELECTED TAB
-    // =========================================================
 
     var selectedTab by remember {
 
@@ -292,9 +216,9 @@ fun PantoneApp(
     }
 
 
-    // =========================================================
-    // PANTONE CALCULATOR
-    // =========================================================
+    /* ========================================================
+       PANTONE CALCULATOR
+       ======================================================== */
 
     if (selectedColor != null) {
 
@@ -312,9 +236,9 @@ fun PantoneApp(
     }
 
 
-    // =========================================================
-    // RECIPE EDITOR
-    // =========================================================
+    /* ========================================================
+       RECIPE EDITOR
+       ======================================================== */
 
     if (
         isRecipeEditorOpen &&
@@ -324,28 +248,38 @@ fun PantoneApp(
         RecipeEditorScreen(
 
             recipe = selectedRecipe,
+
             recipeType = selectedRecipeType!!,
+
             viewModel = recipeViewModel,
-            inkLibraryViewModel = inkLibraryViewModel,
+
+            inkLibraryViewModel =
+                inkLibraryViewModel,
+
             onBack = {
+
                 isRecipeEditorOpen = false
                 selectedRecipe = null
                 selectedRecipeType = null
             },
+
             onSaved = {
+
                 isRecipeEditorOpen = false
                 selectedRecipe = null
                 selectedRecipeType = null
+
                 recipeViewModel.loadAllRecipes()
             }
         )
+
         return
     }
 
 
-    // =========================================================
-    // RECIPE CALCULATOR
-    // =========================================================
+    /* ========================================================
+       FLEXO / OFFSET CALCULATOR
+       ======================================================== */
 
     if (selectedRecipe != null) {
 
@@ -363,9 +297,9 @@ fun PantoneApp(
     }
 
 
-    // =========================================================
-    // MAIN
-    // =========================================================
+    /* ========================================================
+       MAIN
+       ======================================================== */
 
     Column(
 
@@ -374,18 +308,10 @@ fun PantoneApp(
             .statusBarsPadding()
     ) {
 
-        // =====================================================
-        // TABS
-        // =====================================================
-
         ScrollableTabRow(
 
             selectedTabIndex = selectedTab
         ) {
-
-            // =================================================
-            // TAB 1 — PANTONE
-            // =================================================
 
             Tab(
 
@@ -394,7 +320,6 @@ fun PantoneApp(
                 onClick = {
 
                     selectedTab = 0
-
                     recipeViewModel.clearSearch()
                 },
 
@@ -405,10 +330,6 @@ fun PantoneApp(
             )
 
 
-            // =================================================
-            // TAB 2 — FLEXO
-            // =================================================
-
             Tab(
 
                 selected = selectedTab == 1,
@@ -416,7 +337,6 @@ fun PantoneApp(
                 onClick = {
 
                     selectedTab = 1
-
                     recipeViewModel.clearSearch()
                 },
 
@@ -427,10 +347,6 @@ fun PantoneApp(
             )
 
 
-            // =================================================
-            // TAB 3 — OFFSET
-            // =================================================
-
             Tab(
 
                 selected = selectedTab == 2,
@@ -438,7 +354,6 @@ fun PantoneApp(
                 onClick = {
 
                     selectedTab = 2
-
                     recipeViewModel.clearSearch()
                 },
 
@@ -449,10 +364,6 @@ fun PantoneApp(
             )
 
 
-            // =================================================
-            // TAB 4 — INK LIBRARY
-            // =================================================
-
             Tab(
 
                 selected = selectedTab == 3,
@@ -460,7 +371,6 @@ fun PantoneApp(
                 onClick = {
 
                     selectedTab = 3
-
                     recipeViewModel.clearSearch()
                 },
 
@@ -469,9 +379,7 @@ fun PantoneApp(
                     Text("INKS")
                 }
             )
-            // =================================================
-            // TAB 5 — ANILOX
-            // =================================================
+
 
             Tab(
 
@@ -480,27 +388,22 @@ fun PantoneApp(
                 onClick = {
 
                     selectedTab = 4
-
                     recipeViewModel.clearSearch()
                 },
 
                 text = {
+
                     Text("ANILOX")
                 }
             )
-
         }
 
 
-        // =====================================================
-        // CONTENT
-        // =====================================================
-
         when (selectedTab) {
 
-            // =================================================
-            // PANTONE
-            // =================================================
+            /* =================================================
+               PANTONE
+               ================================================= */
 
             0 -> {
 
@@ -508,17 +411,17 @@ fun PantoneApp(
 
                     viewModel = viewModel,
 
-                    onColorClick = { color ->
+                    onColorClick = {
 
-                        selectedColor = color
+                        selectedColor = it
                     }
                 )
             }
 
 
-            // =================================================
-            // FLEXO
-            // =================================================
+            /* =================================================
+               FLEXO
+               ================================================= */
 
             1 -> {
 
@@ -543,14 +446,14 @@ fun PantoneApp(
                         recipeViewModel.searchFlexo(it)
                     },
 
-                    onRecipeClick = { recipe ->
+                    onRecipeClick = {
 
-                        selectedRecipe = recipe
+                        selectedRecipe = it
                     },
 
-                    onEdit = { recipe ->
+                    onEdit = {
 
-                        selectedRecipe = recipe
+                        selectedRecipe = it
 
                         selectedRecipeType =
                             RecipeType.FLEXO
@@ -568,19 +471,17 @@ fun PantoneApp(
                         isRecipeEditorOpen = true
                     },
 
-                    onDelete = { recipe ->
+                    onDelete = {
 
-                        recipeViewModel.deleteRecipe(
-                            recipe
-                        )
+                        recipeViewModel.deleteRecipe(it)
                     }
                 )
             }
 
 
-            // =================================================
-            // OFFSET
-            // =================================================
+            /* =================================================
+               OFFSET
+               ================================================= */
 
             2 -> {
 
@@ -605,14 +506,14 @@ fun PantoneApp(
                         recipeViewModel.searchOffset(it)
                     },
 
-                    onRecipeClick = { recipe ->
+                    onRecipeClick = {
 
-                        selectedRecipe = recipe
+                        selectedRecipe = it
                     },
 
-                    onEdit = { recipe ->
+                    onEdit = {
 
-                        selectedRecipe = recipe
+                        selectedRecipe = it
 
                         selectedRecipeType =
                             RecipeType.OFFSET
@@ -630,34 +531,38 @@ fun PantoneApp(
                         isRecipeEditorOpen = true
                     },
 
-                    onDelete = { recipe ->
+                    onDelete = {
 
-                        recipeViewModel.deleteRecipe(
-                            recipe
-                        )
+                        recipeViewModel.deleteRecipe(it)
                     }
                 )
             }
 
 
-            // =================================================
-            // INK LIBRARY
-            // =================================================
+            /* =================================================
+               INKS
+               ================================================= */
 
             3 -> {
 
                 InkLibraryScreen(
 
-                    viewModel = inkLibraryViewModel
+                    viewModel =
+                        inkLibraryViewModel
                 )
             }
-            //==================================================
-            // ANILOX
-            //==================================================
+
+
+            /* =================================================
+               ANILOX
+               ================================================= */
 
             4 -> {
+
                 AniloxFlexScreen(
-                    viewModel = aniloxFlexViewModel
+
+                    viewModel =
+                        aniloxFlexViewModel
                 )
             }
         }
@@ -680,14 +585,11 @@ fun PantoneScreen(
     val colors by
         viewModel.colors.collectAsState()
 
-
     val searchQuery by
         viewModel.searchQuery.collectAsState()
 
-
     val isLoading by
         viewModel.isLoading.collectAsState()
-
 
     val error by
         viewModel.error.collectAsState()
@@ -709,12 +611,13 @@ fun PantoneScreen(
             fontWeight =
                 FontWeight.Bold,
 
-            modifier = Modifier.padding(
-                start = 16.dp,
-                top = 16.dp,
-                end = 16.dp,
-                bottom = 16.dp
-            )
+            modifier =
+                Modifier.padding(
+                    start = 16.dp,
+                    top = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                )
         )
 
 
@@ -722,14 +625,15 @@ fun PantoneScreen(
 
             value = searchQuery,
 
-            onValueChange = { query ->
+            onValueChange = {
 
-                viewModel.search(query)
+                viewModel.search(it)
             },
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
 
             label = {
 
@@ -810,9 +714,8 @@ fun PantoneScreen(
 
                         items = colors,
 
-                        key = { color ->
-
-                            color.name
+                        key = {
+                            color -> color.name
                         }
 
                     ) { color ->
@@ -871,14 +774,11 @@ fun RecipeListScreen(
     val recipeList by
         recipes.collectAsState()
 
-
     val query by
         searchQuery.collectAsState()
 
-
     val loading by
         isLoading.collectAsState()
-
 
     val errorMessage by
         error.collectAsState()
@@ -899,12 +799,13 @@ fun RecipeListScreen(
             fontWeight =
                 FontWeight.Bold,
 
-            modifier = Modifier.padding(
-                start = 16.dp,
-                top = 16.dp,
-                end = 16.dp,
-                bottom = 8.dp
-            )
+            modifier =
+                Modifier.padding(
+                    start = 16.dp,
+                    top = 16.dp,
+                    end = 16.dp,
+                    bottom = 8.dp
+                )
         )
 
 
@@ -914,9 +815,10 @@ fun RecipeListScreen(
 
             onValueChange = onSearch,
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
 
             label = {
 
@@ -937,9 +839,10 @@ fun RecipeListScreen(
 
             onClick = onAdd,
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
         ) {
 
             Text(
@@ -1028,10 +931,12 @@ fun RecipeListScreen(
                                 FontWeight.Bold
                         )
 
+
                         Spacer(
                             modifier =
                                 Modifier.height(8.dp)
                         )
+
 
                         Text(
                             text =
@@ -1112,15 +1017,16 @@ fun RecipeCard(
 
     Column(
 
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            }
-            .padding(
-                horizontal = 16.dp,
-                vertical = 8.dp
-            )
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onClick()
+                }
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 8.dp
+                )
     ) {
 
         Row(
@@ -1154,14 +1060,15 @@ fun RecipeCard(
 
             Box(
 
-                modifier = Modifier
-                    .width(55.dp)
-                    .height(55.dp)
-                    .background(color)
-                    .border(
-                        1.dp,
-                        Color.LightGray
-                    )
+                modifier =
+                    Modifier
+                        .width(55.dp)
+                        .height(55.dp)
+                        .background(color)
+                        .border(
+                            1.dp,
+                            Color.LightGray
+                        )
             )
 
 
@@ -1222,8 +1129,7 @@ fun RecipeCard(
 
                     Text(
 
-                        text =
-                            "Удалить",
+                        text = "Удалить",
 
                         color =
                             MaterialTheme
@@ -1237,26 +1143,31 @@ fun RecipeCard(
 
         Column(
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 67.dp,
-                    top = 4.dp,
-                    bottom = 8.dp
-                )
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 67.dp,
+                        top = 4.dp,
+                        bottom = 8.dp
+                    )
         ) {
 
             RecipeRow(
+
                 colorName =
                     recipe.baseColor1,
+
                 percent =
                     recipe.percentColor1
             )
 
 
             RecipeRow(
+
                 colorName =
                     recipe.baseColor2,
+
                 percent =
                     recipe.percentColor2
             )
@@ -1273,8 +1184,7 @@ fun RecipeCard(
                         recipe.baseColor3,
 
                     percent =
-                        recipe.percentColor3
-                            ?: 0.0
+                        recipe.percentColor3 ?: 0.0
                 )
             }
 
@@ -1290,116 +1200,145 @@ fun RecipeCard(
                         recipe.baseColor4,
 
                     percent =
-                        recipe.percentColor4
-                            ?: 0.0
+                        recipe.percentColor4 ?: 0.0
                 )
             }
         }
     }
 }
-/*===============================================
-DATA class для рецептов
-============================================= */
+
+
+/* ============================================================
+   CALCULATOR DATA
+   ============================================================ */
+
 private data class CalculatorComponent(
+
     val name: String,
-    val percent: Double,
-    val weight: String = ""
+
+    val percent: Double
 )
-/*=================================
-CALCULATOR MODE
- ================================*/
+
+
 private enum class CalculatorMode {
+
     TOTAL_WEIGHT,
+
     NEW_RECIPE
 }
 
-/* ============================================================
-   RECIPE CALCULATOR
-   ============================================================ */
 
+/* ============================================================
+   FLEXO / OFFSET CALCULATOR
+   ============================================================ */
 
 @Composable
 fun RecipeCalculatorScreen(
+
     recipe: CustomRecipe,
+
     onBack: () -> Unit
 ) {
 
-    /*
-     * Два режима:
-     *
-     * TOTAL_WEIGHT
-     *     Пользователь задаёт общую массу.
-     *     Проценты берутся из сохранённого рецепта.
-     *
-     * NEW_RECIPE
-     *     Пользователь вводит фактическое количество
-     *     каждого базового цвета.
-     *     Проценты рассчитываются автоматически.
-     */
-
-
     var mode by remember {
-        mutableStateOf(CalculatorMode.TOTAL_WEIGHT)
+
+        mutableStateOf(
+            CalculatorMode.TOTAL_WEIGHT
+        )
     }
 
+
     var totalWeight by remember {
+
         mutableStateOf("")
     }
 
-    /*
-     * Формируем список базовых цветов
-     * из существующего CustomRecipe.
-     */
-    val components = remember(recipe) {
 
-        buildList {
+    val components =
+        remember(recipe) {
 
-            if (recipe.baseColor1.isNotBlank()) {
+            buildList {
 
-                add(
-                    CalculatorComponent(
-                        name = recipe.baseColor1,
-                        percent = recipe.percentColor1
+                if (
+                    recipe.baseColor1
+                        .isNotBlank()
+                ) {
+
+                    add(
+
+                        CalculatorComponent(
+
+                            name =
+                                recipe.baseColor1,
+
+                            percent =
+                                recipe.percentColor1
+                        )
                     )
-                )
-            }
+                }
 
-            if (recipe.baseColor2.isNotBlank()) {
 
-                add(
-                    CalculatorComponent(
-                        name = recipe.baseColor2,
-                        percent = recipe.percentColor2
+                if (
+                    recipe.baseColor2
+                        .isNotBlank()
+                ) {
+
+                    add(
+
+                        CalculatorComponent(
+
+                            name =
+                                recipe.baseColor2,
+
+                            percent =
+                                recipe.percentColor2
+                        )
                     )
-                )
-            }
+                }
 
-            if (!recipe.baseColor3.isNullOrBlank()) {
 
-                add(
-                    CalculatorComponent(
-                        name = recipe.baseColor3,
-                        percent = recipe.percentColor3 ?: 0.0
+                if (
+                    !recipe.baseColor3
+                        .isNullOrBlank()
+                ) {
+
+                    add(
+
+                        CalculatorComponent(
+
+                            name =
+                                recipe.baseColor3,
+
+                            percent =
+                                recipe.percentColor3
+                                    ?: 0.0
+                        )
                     )
-                )
-            }
+                }
 
-            if (!recipe.baseColor4.isNullOrBlank()) {
 
-                add(
-                    CalculatorComponent(
-                        name = recipe.baseColor4,
-                        percent = recipe.percentColor4 ?: 0.0
+                if (
+                    !recipe.baseColor4
+                        .isNullOrBlank()
+                ) {
+
+                    add(
+
+                        CalculatorComponent(
+
+                            name =
+                                recipe.baseColor4,
+
+                            percent =
+                                recipe.percentColor4
+                                    ?: 0.0
+                        )
                     )
-                )
+                }
             }
         }
-    }
 
-    /*
-     * Количества компонентов в режиме
-     * создания нового рецепта.
-     */
+
     var componentWeights by remember(recipe) {
 
         mutableStateOf(
@@ -1409,71 +1348,72 @@ fun RecipeCalculatorScreen(
         )
     }
 
-    /*
-     * Общий вес, рассчитанный из введённых
-     * пользователем компонентов.
-     */
-    val calculatedTotalWeight = remember(
-        componentWeights
-    ) {
 
-        componentWeights.sumOf {
+    val calculatedTotalWeight =
+        remember(componentWeights) {
 
-            it
-                .replace(",", ".")
-                .toDoubleOrNull()
-                ?: 0.0
-        }
-    }
+            componentWeights.sumOf {
 
-    /*
-     * Проценты для режима NEW_RECIPE.
-     */
-    val calculatedPercentages = remember(
-        componentWeights,
-        calculatedTotalWeight
-    ) {
-
-        if (calculatedTotalWeight <= 0.0) {
-
-            List(componentWeights.size) {
-                0.0
-            }
-
-        } else {
-
-            componentWeights.map {
-
-                val weight =
-                    it
-                        .replace(",", ".")
-                        .toDoubleOrNull()
-                        ?: 0.0
-
-                weight /
-                        calculatedTotalWeight *
-                        100.0
+                it
+                    .replace(",", ".")
+                    .toDoubleOrNull()
+                    ?: 0.0
             }
         }
-    }
+
+
+    val calculatedPercentages =
+        remember(
+            componentWeights,
+            calculatedTotalWeight
+        ) {
+
+            if (
+                calculatedTotalWeight <= 0.0
+            ) {
+
+                List(
+                    componentWeights.size
+                ) {
+                    0.0
+                }
+
+            } else {
+
+                componentWeights.map {
+
+                    val weight =
+                        it
+                            .replace(",", ".")
+                            .toDoubleOrNull()
+                            ?: 0.0
+
+                    weight /
+                            calculatedTotalWeight *
+                            100.0
+                }
+            }
+        }
 
 
     Column(
-        modifier = Modifier.fillMaxSize()
+
+        modifier =
+            Modifier.fillMaxSize()
     ) {
 
-        /*
-         * HEADER
-         */
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 8.dp,
-                    top = 12.dp,
-                    end = 16.dp,
-                    bottom = 12.dp
-                ),
+
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 8.dp,
+                        top = 12.dp,
+                        end = 16.dp,
+                        bottom = 12.dp
+                    ),
+
             verticalAlignment =
                 Alignment.CenterVertically
         ) {
@@ -1485,46 +1425,62 @@ fun RecipeCalculatorScreen(
                 Text("← Назад")
             }
 
+
             Spacer(
-                modifier = Modifier.width(8.dp)
+                modifier =
+                    Modifier.width(8.dp)
             )
 
+
             Text(
+
                 text = "Калькулятор",
+
                 fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+
+                fontWeight =
+                    FontWeight.Bold
             )
         }
 
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
         ) {
 
             Text(
-                text = recipe.name,
+
+                text =
+                    recipe.name,
+
                 fontSize = 28.sp,
-                fontWeight = FontWeight.Bold
+
+                fontWeight =
+                    FontWeight.Bold
             )
+
 
             Spacer(
-                modifier = Modifier.height(16.dp)
+                modifier =
+                    Modifier.height(16.dp)
             )
 
 
-            /*
-             * ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМА
-             */
             Row(
-                modifier = Modifier.fillMaxWidth()
+
+                modifier =
+                    Modifier.fillMaxWidth()
             ) {
 
                 FilterChip(
+
                     selected =
                         mode ==
-                                CalculatorMode.TOTAL_WEIGHT,
+                            CalculatorMode.TOTAL_WEIGHT,
 
                     onClick = {
 
@@ -1533,18 +1489,23 @@ fun RecipeCalculatorScreen(
                     },
 
                     label = {
+
                         Text("Общий вес")
                     }
                 )
 
+
                 Spacer(
-                    modifier = Modifier.width(8.dp)
+                    modifier =
+                        Modifier.width(8.dp)
                 )
 
+
                 FilterChip(
+
                     selected =
                         mode ==
-                                CalculatorMode.NEW_RECIPE,
+                            CalculatorMode.NEW_RECIPE,
 
                     onClick = {
 
@@ -1553,6 +1514,7 @@ fun RecipeCalculatorScreen(
                     },
 
                     label = {
+
                         Text("Новый рецепт")
                     }
                 )
@@ -1560,24 +1522,22 @@ fun RecipeCalculatorScreen(
 
 
             Spacer(
-                modifier = Modifier.height(20.dp)
+                modifier =
+                    Modifier.height(20.dp)
             )
 
 
             when (mode) {
 
-                /*
-                 * ========================================
-                 * РЕЖИМ ОБЩЕГО ВЕСА
-                 * ========================================
-                 */
                 CalculatorMode.TOTAL_WEIGHT -> {
 
                     OutlinedTextField(
 
-                        value = totalWeight,
+                        value =
+                            totalWeight,
 
                         onValueChange = {
+
                             totalWeight = it
                         },
 
@@ -1585,10 +1545,12 @@ fun RecipeCalculatorScreen(
                             Modifier.fillMaxWidth(),
 
                         label = {
+
                             Text("Общий вес")
                         },
 
                         placeholder = {
+
                             Text("Например: 1000")
                         },
 
@@ -1609,9 +1571,13 @@ fun RecipeCalculatorScreen(
 
 
                     Text(
+
                         text = "Рецепт",
+
                         fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
+
+                        fontWeight =
+                            FontWeight.Bold
                     )
 
 
@@ -1630,10 +1596,17 @@ fun RecipeCalculatorScreen(
                     components.forEach {
 
                         RecipeCalculatorRow(
-                            colorName = it.name,
-                            percent = it.percent,
-                            totalWeight = weight
+
+                            colorName =
+                                it.name,
+
+                            percent =
+                                it.percent,
+
+                            totalWeight =
+                                weight
                         )
+
 
                         Spacer(
                             modifier =
@@ -1649,7 +1622,9 @@ fun RecipeCalculatorScreen(
                                 Modifier.height(12.dp)
                         )
 
+
                         Text(
+
                             text =
                                 "Итого: ${
                                     formatWeight(weight)
@@ -1664,17 +1639,13 @@ fun RecipeCalculatorScreen(
                 }
 
 
-                /*
-                 * ========================================
-                 * НОВЫЙ РЕЦЕПТ
-                 * ========================================
-                 */
                 CalculatorMode.NEW_RECIPE -> {
 
                     Text(
+
                         text =
                             "Введите фактическое количество " +
-                                    "каждого базового цвета",
+                                "каждого базового цвета",
 
                         fontSize = 16.sp
                     )
@@ -1714,6 +1685,7 @@ fun RecipeCalculatorScreen(
                             }
                         )
 
+
                         Spacer(
                             modifier =
                                 Modifier.height(6.dp)
@@ -1727,24 +1699,29 @@ fun RecipeCalculatorScreen(
                     )
 
 
-                    /*
-                     * ИТОГОВЫЙ ВЕС
-                     */
                     Row(
+
                         modifier =
                             Modifier.fillMaxWidth(),
+
                         horizontalArrangement =
                             Arrangement.SpaceBetween
                     ) {
 
                         Text(
-                            text = "Общий вес",
+
+                            text =
+                                "Общий вес",
+
                             fontSize = 18.sp,
+
                             fontWeight =
                                 FontWeight.Bold
                         )
 
+
                         Text(
+
                             text =
                                 if (
                                     calculatedTotalWeight > 0
@@ -1773,9 +1750,6 @@ fun RecipeCalculatorScreen(
                     )
 
 
-                    /*
-                     * ПРОВЕРКА ПРОЦЕНТОВ
-                     */
                     if (
                         calculatedTotalWeight > 0
                     ) {
@@ -1785,6 +1759,7 @@ fun RecipeCalculatorScreen(
 
 
                         Text(
+
                             text =
                                 "Сумма процентов: ${
                                     formatPercent(
@@ -1814,38 +1789,53 @@ fun RecipeCalculatorScreen(
         }
     }
 }
+
+
 /* ============================================================
    RECIPE CALCULATOR ROW
    ============================================================ */
+
 @Composable
 private fun RecipeCalculatorRow(
+
     colorName: String,
+
     percent: Double,
+
     totalWeight: Double?
 ) {
 
     val grams =
         totalWeight?.let {
-            it * percent / 100.0
+
+            it *
+                percent /
+                100.0
         }
 
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                1.dp,
-                Color.LightGray
-            )
-            .padding(
-                vertical = 10.dp,
-                horizontal = 8.dp
-            ),
+
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .border(
+                    1.dp,
+                    Color.LightGray
+                )
+                .padding(
+                    vertical = 10.dp,
+                    horizontal = 8.dp
+                ),
+
         verticalAlignment =
             Alignment.CenterVertically
     ) {
 
         Text(
-            text = colorName,
+
+            text =
+                colorName,
 
             modifier =
                 Modifier.weight(1f),
@@ -1858,6 +1848,7 @@ private fun RecipeCalculatorRow(
 
 
         Text(
+
             text =
                 "${formatPercent(percent)}%",
 
@@ -1873,6 +1864,7 @@ private fun RecipeCalculatorRow(
 
 
         Text(
+
             text =
                 grams?.let {
                     formatWeight(it)
@@ -1889,10 +1881,12 @@ private fun RecipeCalculatorRow(
         )
     }
 }
-/*===========================================
 
 
-=========================================== */
+/* ============================================================
+   NEW RECIPE ROW
+   ============================================================ */
+
 @Composable
 private fun NewRecipeCalculatorRow(
 
@@ -1903,21 +1897,21 @@ private fun NewRecipeCalculatorRow(
     percent: Double,
 
     onWeightChange: (String) -> Unit
-
 ) {
 
     Row(
 
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                1.dp,
-                Color.LightGray
-            )
-            .padding(
-                vertical = 8.dp,
-                horizontal = 8.dp
-            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .border(
+                    1.dp,
+                    Color.LightGray
+                )
+                .padding(
+                    vertical = 8.dp,
+                    horizontal = 8.dp
+                ),
 
         verticalAlignment =
             Alignment.CenterVertically
@@ -1925,7 +1919,8 @@ private fun NewRecipeCalculatorRow(
 
         Text(
 
-            text = colorName,
+            text =
+                colorName,
 
             modifier =
                 Modifier.weight(1f),
@@ -1939,7 +1934,8 @@ private fun NewRecipeCalculatorRow(
 
         OutlinedTextField(
 
-            value = weight,
+            value =
+                weight,
 
             onValueChange =
                 onWeightChange,
@@ -1948,6 +1944,7 @@ private fun NewRecipeCalculatorRow(
                 Modifier.width(120.dp),
 
             label = {
+
                 Text("Кол-во")
             },
 
@@ -1970,7 +1967,9 @@ private fun NewRecipeCalculatorRow(
         Text(
 
             text =
-                if (weight.isNotBlank()) {
+                if (
+                    weight.isNotBlank()
+                ) {
 
                     "${formatPercent(percent)}%"
 
@@ -1990,10 +1989,6 @@ private fun NewRecipeCalculatorRow(
         )
     }
 }
-
-
-
-
 
 
 /* ============================================================
@@ -2030,35 +2025,37 @@ fun PantoneColorCard(
 
     Column(
 
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            }
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onClick()
+                }
     ) {
 
         Box(
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(140.dp)
-                .background(
-                    color =
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(140.dp)
+                    .background(
                         backgroundColor
-                )
+                    )
         )
 
 
         Row(
 
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 12.dp,
-                    end = 12.dp,
-                    top = 10.dp,
-                    bottom = 36.dp
-                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 12.dp,
+                        end = 12.dp,
+                        top = 10.dp,
+                        bottom = 36.dp
+                    ),
 
             verticalAlignment =
                 Alignment.Top
@@ -2066,9 +2063,10 @@ fun PantoneColorCard(
 
             Column(
 
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 16.dp),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(end = 16.dp),
 
                 horizontalAlignment =
                     Alignment.Start
@@ -2076,8 +2074,7 @@ fun PantoneColorCard(
 
                 Text(
 
-                    text =
-                        "PANTONE",
+                    text = "PANTONE",
 
                     fontSize = 20.sp,
 
@@ -2198,8 +2195,8 @@ private fun RecipeRow(
 
     Row(
 
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier =
+            Modifier.fillMaxWidth(),
 
         verticalAlignment =
             Alignment.CenterVertically
@@ -2239,12 +2236,14 @@ private fun RecipeRow(
             textAlign =
                 TextAlign.End,
 
-            modifier = Modifier
-                .width(55.dp)
-                .padding(start = 8.dp)
+            modifier =
+                Modifier
+                    .width(55.dp)
+                    .padding(start = 8.dp)
         )
     }
 }
+
 
 
 /* ============================================================
@@ -2259,33 +2258,338 @@ fun PantoneCalculatorScreen(
     onBack: () -> Unit
 ) {
 
-    var totalWeight by remember {
+    /*===================
+      Общая масса краски
+    ======================
+
+      Это основное поле.
+
+      Если пользователь меняет общую массу,
+      массы всех базовых цветов пересчитываются
+      по сохранённым процентам Pantone.
+     */
+
+    var totalWeightText by remember {
 
         mutableStateOf("")
     }
 
 
-    val weight =
-        totalWeight
-            .replace(",", ".")
-            .toDoubleOrNull()
+    /*
+     * --------------------------------------------------------
+     * Массы базовых цветов
+     * --------------------------------------------------------
+     *
+     * Здесь хранятся именно значения в граммах,
+     * которые отображаются в редактируемых полях.
+     */
+
+    var componentWeights by remember(color) {
+
+        mutableStateOf(
+            listOf("", "", "", "")
+        )
+    }
 
 
-    val totalPercent =
+    /*
+     * --------------------------------------------------------
+     * Проценты Pantone
+     * --------------------------------------------------------
+     *
+     * Проценты НЕ изменяются пользователем.
+     */
 
-        color.percentColor1 +
+    val percentages = remember(color) {
 
-        color.percentColor2 +
+        listOf(
+            color.percentColor1,
+            color.percentColor2,
+            color.percentColor3 ?: 0.0,
+            color.percentColor4 ?: 0.0
+        )
+    }
 
-        (color.percentColor3 ?: 0.0) +
 
-        (color.percentColor4 ?: 0.0)
+    /*
+     * --------------------------------------------------------
+     * Названия базовых цветов
+     * --------------------------------------------------------
+     */
 
+    val colorNames = remember(color) {
+
+        listOf(
+            color.baseColor1,
+            color.baseColor2,
+            color.baseColor3 ?: "",
+            color.baseColor4 ?: ""
+        )
+    }
+
+
+    /*
+     * --------------------------------------------------------
+     * Сколько компонентов реально используется
+     * --------------------------------------------------------
+     */
+
+    val componentCount = remember(color) {
+
+        colorNames.count {
+            it.isNotBlank()
+        }
+    }
+
+
+    /*
+     * --------------------------------------------------------
+     * Синхронизация полей при смене Pantone
+     * --------------------------------------------------------
+     */
+
+    androidx.compose.runtime.LaunchedEffect(color) {
+
+        totalWeightText = ""
+
+        componentWeights =
+            listOf("", "", "", "")
+    }
+
+
+    /*
+     * --------------------------------------------------------
+     * Изменение ОБЩЕЙ МАССЫ
+     * --------------------------------------------------------
+     *
+     * Например:
+     *
+     * Pantone:
+     *
+     * 50%
+     * 30%
+     * 20%
+     *
+     * Общая масса = 1000
+     *
+     * Получаем:
+     *
+     * 500 г
+     * 300 г
+     * 200 г
+     */
+
+    fun updateFromTotalWeight(
+        value: String
+    ) {
+
+        totalWeightText = value
+
+        val totalWeight =
+            value
+                .replace(",", ".")
+                .toDoubleOrNull()
+
+        if (
+            totalWeight == null ||
+            totalWeight < 0.0
+        ) {
+
+            componentWeights =
+                listOf("", "", "", "")
+
+            return
+        }
+
+
+        componentWeights =
+            percentages.mapIndexed { index, percent ->
+
+                if (
+                    index < componentCount &&
+                    colorNames[index].isNotBlank()
+                ) {
+
+                    formatWeight(
+                        totalWeight *
+                                percent /
+                                100.0
+                    )
+
+                } else {
+
+                    ""
+                }
+            }
+    }
+
+
+    /*
+     * --------------------------------------------------------
+     * Изменение МАССЫ ОДНОГО БАЗОВОГО ЦВЕТА
+     * --------------------------------------------------------
+     *
+     * Например:
+     *
+     * 50% = 500 г
+     * 30% = 300 г
+     * 20% = 200 г
+     *
+     * Пользователь меняет первый цвет:
+     *
+     * 500 -> 600 г
+     *
+     * Тогда:
+     *
+     * Общая масса:
+     *
+     * 600 / 50 * 100 = 1200 г
+     *
+     * Остальные:
+     *
+     * 30% = 360 г
+     * 20% = 240 г
+     */
+
+    fun updateFromComponentWeight(
+        index: Int,
+        value: String
+    ) {
+
+        val newWeights =
+            componentWeights
+                .toMutableList()
+
+
+        newWeights[index] =
+            value
+
+
+        val changedWeight =
+            value
+                .replace(",", ".")
+                .toDoubleOrNull()
+
+
+        val percent =
+            percentages[index]
+
+
+        /*
+         * Если значение пустое —
+         * просто очищаем поле.
+         */
+
+        if (
+            changedWeight == null ||
+            changedWeight < 0.0
+        ) {
+
+            componentWeights =
+                newWeights
+
+            return
+        }
+
+
+        /*
+         * Защита от деления на ноль.
+         */
+
+        if (percent <= 0.0) {
+
+            componentWeights =
+                newWeights
+
+            return
+        }
+
+
+        /*
+         * Рассчитываем новую общую массу.
+         */
+
+        val newTotalWeight =
+            changedWeight *
+                    100.0 /
+                    percent
+
+
+        /*
+         * Записываем новую общую массу.
+         */
+
+        totalWeightText =
+            formatWeight(
+                newTotalWeight
+            )
+
+
+        /*
+         * Теперь пересчитываем ВСЕ компоненты
+         * относительно новой общей массы.
+         */
+
+        componentWeights =
+            percentages.mapIndexed {
+                    componentIndex,
+                    componentPercent ->
+
+                if (
+                    componentIndex < componentCount &&
+                    colorNames[componentIndex]
+                        .isNotBlank()
+                ) {
+
+                    /*
+                     * Для изменяемого компонента
+                     * оставляем введённое пользователем
+                     * значение.
+                     *
+                     * Это позволяет сохранить ровно
+                     * введённую массу.
+                     */
+
+                    if (
+                        componentIndex == index
+                    ) {
+
+                        value
+
+                    } else {
+
+                        formatWeight(
+                            newTotalWeight *
+                                    componentPercent /
+                                    100.0
+                        )
+                    }
+
+                } else {
+
+                    ""
+                }
+            }
+    }
+
+
+    /*
+     * --------------------------------------------------------
+     * UI
+     * --------------------------------------------------------
+     */
 
     Column(
+
         modifier =
             Modifier.fillMaxSize()
     ) {
+
+        /*
+         * ----------------------------------------------------
+         * HEADER
+         * ----------------------------------------------------
+         */
 
         Row(
 
@@ -2303,13 +2607,13 @@ fun PantoneCalculatorScreen(
         ) {
 
             TextButton(
+
                 onClick = onBack
+
             ) {
 
                 Text(
-                    text =
-                        "← Назад",
-
+                    text = "← Назад",
                     fontSize = 16.sp
                 )
             }
@@ -2338,8 +2642,16 @@ fun PantoneCalculatorScreen(
 
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(
+                    horizontal = 16.dp
+                )
         ) {
+
+            /*
+             * ------------------------------------------------
+             * НАЗВАНИЕ PANTONE
+             * ------------------------------------------------
+             */
 
             Text(
 
@@ -2362,14 +2674,20 @@ fun PantoneCalculatorScreen(
             )
 
 
+            /*
+             * ------------------------------------------------
+             * ОБЩАЯ МАССА
+             * ------------------------------------------------
+             */
+
             OutlinedTextField(
 
                 value =
-                    totalWeight,
+                    totalWeightText,
 
                 onValueChange = {
 
-                    totalWeight = it
+                    updateFromTotalWeight(it)
                 },
 
                 modifier =
@@ -2377,12 +2695,16 @@ fun PantoneCalculatorScreen(
 
                 label = {
 
-                    Text("Общий вес краски")
+                    Text(
+                        "Общий вес краски"
+                    )
                 },
 
                 placeholder = {
 
-                    Text("Например: 1000")
+                    Text(
+                        "Например: 1000"
+                    )
                 },
 
                 singleLine = true,
@@ -2400,6 +2722,12 @@ fun PantoneCalculatorScreen(
                     Modifier.height(24.dp)
             )
 
+
+            /*
+             * ------------------------------------------------
+             * ЗАГОЛОВОК
+             * ------------------------------------------------
+             */
 
             Text(
 
@@ -2422,94 +2750,149 @@ fun PantoneCalculatorScreen(
             )
 
 
-            CalculatorTableHeader()
+            /*
+             * ------------------------------------------------
+             * ТАБЛИЦА
+             * ------------------------------------------------
+             */
+
+            PantoneCalculatorTableHeader()
 
 
-            CalculatorRecipeRow(
+            /*
+             * ------------------------------------------------
+             * БАЗОВЫЕ ЦВЕТА
+             * ------------------------------------------------
+             */
 
-                colorName =
-                    color.baseColor1,
+            colorNames.forEachIndexed {
 
-                percent =
-                    color.percentColor1,
+                index,
+                colorName ->
 
-                totalWeight =
-                    weight
-            )
+                if (
+                    colorName.isNotBlank()
+                ) {
 
+                    PantoneEditableRecipeRow(
 
-            CalculatorRecipeRow(
+                        colorName =
+                            colorName,
 
-                colorName =
-                    color.baseColor2,
+                        percent =
+                            percentages[index],
 
-                percent =
-                    color.percentColor2,
+                        weight =
+                            componentWeights[index],
 
-                totalWeight =
-                    weight
-            )
+                        onWeightChange = {
 
+                            value ->
 
-            if (
-                !color.baseColor3
-                    .isNullOrBlank()
-            ) {
-
-                CalculatorRecipeRow(
-
-                    colorName =
-                        color.baseColor3,
-
-                    percent =
-                        color.percentColor3
-                            ?: 0.0,
-
-                    totalWeight =
-                        weight
-                )
+                            updateFromComponentWeight(
+                                index = index,
+                                value = value
+                            )
+                        }
+                    )
+                }
             }
 
 
-            if (
-                !color.baseColor4
-                    .isNullOrBlank()
+            /*
+             * ------------------------------------------------
+             * ИТОГО
+             * ------------------------------------------------
+             */
+
+            val calculatedTotal =
+                componentWeights.sumOf {
+
+                    it
+                        .replace(",", ".")
+                        .toDoubleOrNull()
+                        ?: 0.0
+                }
+
+
+            Spacer(
+                modifier =
+                    Modifier.height(8.dp)
+            )
+
+
+            Row(
+
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Color(0xFFF0F0F0)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = Color.LightGray
+                    )
+                    .padding(
+                        vertical = 12.dp
+                    ),
+
+                verticalAlignment =
+                    Alignment.CenterVertically
             ) {
 
-                CalculatorRecipeRow(
+                Text(
 
-                    colorName =
-                        color.baseColor4,
+                    text =
+                        "Итого",
 
-                    percent =
-                        color.percentColor4
-                            ?: 0.0,
+                    fontSize = 18.sp,
 
-                    totalWeight =
-                        weight
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .padding(
+                                start = 8.dp
+                            )
+                )
+
+
+                Text(
+
+                    text =
+                        formatWeight(
+                            calculatedTotal
+                        ) + " г",
+
+                    fontSize = 18.sp,
+
+                    fontWeight =
+                        FontWeight.Bold,
+
+                    textAlign =
+                        TextAlign.End,
+
+                    modifier =
+                        Modifier
+                            .width(120.dp)
+                            .padding(
+                                end = 8.dp
+                            )
                 )
             }
-
-
-            CalculatorTotalRow(
-
-                totalPercent =
-                    totalPercent,
-
-                totalWeight =
-                    weight
-            )
         }
     }
 }
 
 
 /* ============================================================
-   CALCULATOR TABLE HEADER
+   PANTONE CALCULATOR TABLE HEADER
    ============================================================ */
 
 @Composable
-private fun CalculatorTableHeader() {
+private fun PantoneCalculatorTableHeader() {
 
     Row(
 
@@ -2517,7 +2900,6 @@ private fun CalculatorTableHeader() {
             .fillMaxWidth()
             .background(
                 Color(0xFFE8E8E8),
-
                 RoundedCornerShape(
                     topStart = 6.dp,
                     topEnd = 6.dp
@@ -2545,9 +2927,12 @@ private fun CalculatorTableHeader() {
             fontWeight =
                 FontWeight.Bold,
 
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp)
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .padding(
+                        start = 8.dp
+                    )
         )
 
 
@@ -2564,9 +2949,12 @@ private fun CalculatorTableHeader() {
             textAlign =
                 TextAlign.End,
 
-            modifier = Modifier
-                .width(90.dp)
-                .padding(end = 8.dp)
+            modifier =
+                Modifier
+                    .width(70.dp)
+                    .padding(
+                        end = 8.dp
+                    )
         )
 
 
@@ -2583,47 +2971,32 @@ private fun CalculatorTableHeader() {
             textAlign =
                 TextAlign.End,
 
-            modifier = Modifier
-                .width(100.dp)
-                .padding(end = 8.dp)
+            modifier =
+                Modifier
+                    .width(120.dp)
+                    .padding(
+                        end = 8.dp
+                    )
         )
     }
 }
 
 
 /* ============================================================
-   CALCULATOR RECIPE ROW
+   PANTONE EDITABLE RECIPE ROW
    ============================================================ */
 
 @Composable
-private fun CalculatorRecipeRow(
+private fun PantoneEditableRecipeRow(
 
     colorName: String,
 
     percent: Double,
 
-    totalWeight: Double?
+    weight: String,
+
+    onWeightChange: (String) -> Unit
 ) {
-
-    if (colorName.isBlank()) {
-
-        return
-    }
-
-
-    val grams =
-
-        if (totalWeight != null) {
-
-            totalWeight *
-                percent /
-                100.0
-
-        } else {
-
-            null
-        }
-
 
     Row(
 
@@ -2634,19 +3007,24 @@ private fun CalculatorRecipeRow(
                 color = Color.LightGray
             )
             .padding(
-                vertical = 10.dp
+                vertical = 6.dp,
+                horizontal = 8.dp
             ),
 
         verticalAlignment =
             Alignment.CenterVertically
     ) {
 
+        /*
+         * Название цвета
+         */
+
         Text(
 
             text =
                 colorName,
 
-            fontSize = 18.sp,
+            fontSize = 17.sp,
 
             fontWeight =
                 FontWeight.Bold,
@@ -2654,18 +3032,24 @@ private fun CalculatorRecipeRow(
             color =
                 Color.Black,
 
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp)
+            modifier =
+                Modifier.weight(1f)
         )
 
+
+        /*
+         * Процент.
+         *
+         * Он только отображается.
+         * Пользователь его не меняет.
+         */
 
         Text(
 
             text =
                 "${formatPercent(percent)}%",
 
-            fontSize = 18.sp,
+            fontSize = 17.sp,
 
             fontWeight =
                 FontWeight.Bold,
@@ -2676,68 +3060,77 @@ private fun CalculatorRecipeRow(
             textAlign =
                 TextAlign.End,
 
-            modifier = Modifier
-                .width(90.dp)
-                .padding(end = 8.dp)
+            modifier =
+                Modifier
+                    .width(70.dp)
+                    .padding(
+                        end = 8.dp
+                    )
         )
 
 
-        Text(
+        /*
+         * Масса компонента.
+         *
+         * ЭТО ПОЛЕ РЕДАКТИРУЕМОЕ.
+         */
 
-            text = if (grams != null) {
+        OutlinedTextField(
 
-                formatWeight(grams)
+            value =
+                weight,
 
-            } else {
+            onValueChange =
+                onWeightChange,
 
-                "—"
+            modifier =
+                Modifier.width(120.dp),
+
+            label = {
+
+                Text("г")
             },
 
-            fontSize = 18.sp,
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType =
+                        KeyboardType.Decimal
+                ),
 
-            fontWeight =
-                FontWeight.Bold,
-
-            color =
-                Color.Black,
-
-            textAlign =
-                TextAlign.End,
-
-            modifier = Modifier
-                .width(100.dp)
-                .padding(end = 8.dp)
+            singleLine = true
         )
     }
 }
 
 
+
 /* ============================================================
-   TOTAL ROW
+   PANTONE MASS TABLE HEADER
    ============================================================ */
 
 @Composable
-private fun CalculatorTotalRow(
-
-    totalPercent: Double,
-
-    totalWeight: Double?
-) {
+private fun PantoneMassTableHeader() {
 
     Row(
 
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                Color(0xFFF0F0F0)
-            )
-            .border(
-                width = 1.dp,
-                color = Color.LightGray
-            )
-            .padding(
-                vertical = 12.dp
-            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    Color(0xFFE8E8E8),
+
+                    RoundedCornerShape(
+                        topStart = 6.dp,
+                        topEnd = 6.dp
+                    )
+                )
+                .border(
+                    1.dp,
+                    Color.LightGray
+                )
+                .padding(
+                    vertical = 10.dp
+                ),
 
         verticalAlignment =
             Alignment.CenterVertically
@@ -2746,25 +3139,26 @@ private fun CalculatorTotalRow(
         Text(
 
             text =
-                "Итого",
+                "Базовый цвет",
 
-            fontSize = 18.sp,
+            fontSize = 15.sp,
 
             fontWeight =
                 FontWeight.Bold,
 
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp)
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
         )
 
 
         Text(
 
             text =
-                "${formatPercent(totalPercent)}%",
+                "%",
 
-            fontSize = 18.sp,
+            fontSize = 15.sp,
 
             fontWeight =
                 FontWeight.Bold,
@@ -2772,28 +3166,19 @@ private fun CalculatorTotalRow(
             textAlign =
                 TextAlign.End,
 
-            modifier = Modifier
-                .width(90.dp)
-                .padding(end = 8.dp)
+            modifier =
+                Modifier
+                    .width(60.dp)
+                    .padding(end = 8.dp)
         )
 
 
         Text(
 
-            text = if (totalWeight != null) {
+            text =
+                "Вес, г",
 
-                formatWeight(
-                    totalWeight *
-                        totalPercent /
-                        100.0
-                )
-
-            } else {
-
-                "—"
-            },
-
-            fontSize = 18.sp,
+            fontSize = 15.sp,
 
             fontWeight =
                 FontWeight.Bold,
@@ -2801,10 +3186,144 @@ private fun CalculatorTotalRow(
             textAlign =
                 TextAlign.End,
 
-            modifier = Modifier
-                .width(100.dp)
-                .padding(end = 8.dp)
+            modifier =
+                Modifier
+                    .width(130.dp)
+                    .padding(end = 8.dp)
         )
+    }
+}
+
+
+/* ============================================================
+   PANTONE MASS ROW
+   ============================================================ */
+
+@Composable
+private fun PantoneMassRow(
+
+    colorName: String,
+
+    percent: Double,
+
+    calculatedWeight: Double?,
+
+    isSelected: Boolean,
+
+    enteredWeight: String,
+
+    onWeightChange: (String) -> Unit
+) {
+
+    Row(
+
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .border(
+                    1.dp,
+                    Color.LightGray
+                )
+                .padding(
+                    vertical = 6.dp,
+                    horizontal = 8.dp
+                ),
+
+        verticalAlignment =
+            Alignment.CenterVertically
+    ) {
+
+        Text(
+
+            text =
+                colorName,
+
+            fontSize = 16.sp,
+
+            fontWeight =
+                FontWeight.Bold,
+
+            modifier =
+                Modifier.weight(1f)
+        )
+
+
+        Text(
+
+            text =
+                "${formatPercent(percent)}%",
+
+            fontSize = 16.sp,
+
+            fontWeight =
+                FontWeight.Bold,
+
+            textAlign =
+                TextAlign.End,
+
+            modifier =
+                Modifier.width(60.dp)
+        )
+
+
+        /*
+         * Здесь пользователь может ввести массу
+         * любого выбранного компонента.
+         *
+         * Для остальных компонентов показывается
+         * автоматически рассчитанная масса.
+         */
+
+        if (isSelected) {
+
+            OutlinedTextField(
+
+                value =
+                    enteredWeight,
+
+                onValueChange =
+                    onWeightChange,
+
+                modifier =
+                    Modifier.width(130.dp),
+
+                label = {
+
+                    Text("Вес")
+                },
+
+                singleLine = true,
+
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType =
+                            KeyboardType.Decimal
+                    )
+            )
+
+        } else {
+
+            Text(
+
+                text =
+                    calculatedWeight?.let {
+
+                        formatWeight(it)
+
+                    } ?: "—",
+
+                fontSize = 16.sp,
+
+                fontWeight =
+                    FontWeight.Bold,
+
+                textAlign =
+                    TextAlign.End,
+
+                modifier =
+                    Modifier.width(130.dp)
+            )
+        }
     }
 }
 
@@ -2814,10 +3333,14 @@ private fun CalculatorTotalRow(
    ============================================================ */
 
 private fun formatPercent(
+
     value: Double
+
 ): String {
 
-    return if (value % 1.0 == 0.0) {
+    return if (
+        value % 1.0 == 0.0
+    ) {
 
         value.toInt().toString()
 
@@ -2839,10 +3362,14 @@ private fun formatPercent(
    ============================================================ */
 
 private fun formatWeight(
+
     value: Double
+
 ): String {
 
-    return if (value % 1.0 == 0.0) {
+    return if (
+        value % 1.0 == 0.0
+    ) {
 
         value.toInt().toString()
 
