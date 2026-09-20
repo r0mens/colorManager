@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -1232,178 +1234,191 @@ private enum class CalculatorMode {
    FLEXO / OFFSET CALCULATOR
    ============================================================ */
 
+
 @Composable
 fun RecipeCalculatorScreen(
-
     recipe: CustomRecipe,
-
     onBack: () -> Unit
 ) {
 
     var mode by remember {
-
         mutableStateOf(
             CalculatorMode.TOTAL_WEIGHT
         )
     }
 
-
     var totalWeight by remember {
-
         mutableStateOf("")
     }
 
+    // ============================================================
+    // БАЗОВЫЕ ЦВЕТА И ПРОЦЕНТЫ ИЗ СОХРАНЁННОГО РЕЦЕПТА
+    // ============================================================
 
-    val components =
-        remember(recipe) {
+    val components = remember(recipe) {
 
-            buildList {
+        buildList {
 
-                if (
-                    recipe.baseColor1
-                        .isNotBlank()
-                ) {
+            if (recipe.baseColor1.isNotBlank()) {
 
-                    add(
-
-                        CalculatorComponent(
-
-                            name =
-                                recipe.baseColor1,
-
-                            percent =
-                                recipe.percentColor1
-                        )
+                add(
+                    CalculatorComponent(
+                        name = recipe.baseColor1,
+                        percent = recipe.percentColor1
                     )
-                }
+                )
+            }
 
+            if (recipe.baseColor2.isNotBlank()) {
 
-                if (
-                    recipe.baseColor2
-                        .isNotBlank()
-                ) {
-
-                    add(
-
-                        CalculatorComponent(
-
-                            name =
-                                recipe.baseColor2,
-
-                            percent =
-                                recipe.percentColor2
-                        )
+                add(
+                    CalculatorComponent(
+                        name = recipe.baseColor2,
+                        percent = recipe.percentColor2
                     )
-                }
+                )
+            }
 
+            if (!recipe.baseColor3.isNullOrBlank()) {
 
-                if (
-                    !recipe.baseColor3
-                        .isNullOrBlank()
-                ) {
-
-                    add(
-
-                        CalculatorComponent(
-
-                            name =
-                                recipe.baseColor3,
-
-                            percent =
-                                recipe.percentColor3
-                                    ?: 0.0
-                        )
+                add(
+                    CalculatorComponent(
+                        name = recipe.baseColor3!!,
+                        percent = recipe.percentColor3 ?: 0.0
                     )
-                }
+                )
+            }
 
+            if (!recipe.baseColor4.isNullOrBlank()) {
 
-                if (
-                    !recipe.baseColor4
-                        .isNullOrBlank()
-                ) {
-
-                    add(
-
-                        CalculatorComponent(
-
-                            name =
-                                recipe.baseColor4,
-
-                            percent =
-                                recipe.percentColor4
-                                    ?: 0.0
-                        )
+                add(
+                    CalculatorComponent(
+                        name = recipe.baseColor4!!,
+                        percent = recipe.percentColor4 ?: 0.0
                     )
-                }
+                )
             }
         }
-
-
-    var componentWeights by remember(recipe) {
-
-        mutableStateOf(
-            components.map {
-                ""
-            }
-        )
     }
 
+    // ============================================================
+    // ВЕС, КОТОРЫЙ ПОЛЬЗОВАТЕЛЬ ВВОДИТ ДЛЯ ОДНОГО ЦВЕТА
+    // ============================================================
+
+    var selectedComponentIndex by remember {
+        mutableStateOf<Int?>(null)
+    }
+
+    var selectedComponentWeight by remember {
+        mutableStateOf("")
+    }
+
+    // ============================================================
+    // СУММА ПРОЦЕНТОВ СОХРАНЁННОГО РЕЦЕПТА
+    // ============================================================
+
+    val recipeTotalPercent = remember(components) {
+
+        components.sumOf {
+            it.percent
+        }
+    }
+
+    // ============================================================
+    // РАСЧЁТ ПО ОДНОМУ БАЗОВОМУ ЦВЕТУ
+    // ============================================================
+
+    val enteredWeight =
+        selectedComponentWeight
+            .replace(",", ".")
+            .toDoubleOrNull()
 
     val calculatedTotalWeight =
-        remember(componentWeights) {
+        if (
+            enteredWeight != null &&
+            enteredWeight > 0.0 &&
+            selectedComponentIndex != null &&
+            recipeTotalPercent > 0.0
+        ) {
 
-            componentWeights.sumOf {
+            val selectedPercent =
+                components[
+                    selectedComponentIndex!!
+                ].percent
 
-                it
-                    .replace(",", ".")
-                    .toDoubleOrNull()
-                    ?: 0.0
+            if (selectedPercent > 0.0) {
+
+                enteredWeight *
+                        recipeTotalPercent /
+                        selectedPercent
+
+            } else {
+
+                0.0
             }
+
+        } else {
+
+            0.0
         }
 
+    // ============================================================
+    // РАССЧИТАННЫЕ ВЕСА ВСЕХ БАЗОВЫХ ЦВЕТОВ
+    // ============================================================
 
-    val calculatedPercentages =
+    val calculatedWeights =
         remember(
-            componentWeights,
+            components,
+            selectedComponentIndex,
+            enteredWeight,
             calculatedTotalWeight
         ) {
 
             if (
+                selectedComponentIndex == null ||
+                enteredWeight == null ||
+                enteredWeight <= 0.0 ||
                 calculatedTotalWeight <= 0.0
             ) {
 
-                List(
-                    componentWeights.size
-                ) {
-                    0.0
+                List(components.size) {
+                    null
                 }
 
             } else {
 
-                componentWeights.map {
+                components.mapIndexed { index, component ->
 
-                    val weight =
-                        it
-                            .replace(",", ".")
-                            .toDoubleOrNull()
-                            ?: 0.0
+                    if (
+                        index ==
+                        selectedComponentIndex
+                    ) {
 
-                    weight /
-                            calculatedTotalWeight *
-                            100.0
+                        enteredWeight
+
+                    } else {
+
+                        calculatedTotalWeight *
+                                component.percent /
+                                recipeTotalPercent
+                    }
                 }
             }
         }
 
+    // ============================================================
+    // ЭКРАН
+    // ============================================================
 
     Column(
-
-        modifier =
-            Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
 
-        Row(
+        // ========================================================
+        // HEADER
+        // ========================================================
 
+        Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -1425,62 +1440,73 @@ fun RecipeCalculatorScreen(
                 Text("← Назад")
             }
 
-
             Spacer(
                 modifier =
                     Modifier.width(8.dp)
             )
 
-
             Text(
-
                 text = "Калькулятор",
-
                 fontSize = 22.sp,
-
-                fontWeight =
-                    FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
         }
 
+        // ========================================================
+        // CONTENT
+        // ========================================================
 
         Column(
-
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .verticalScroll(
+                        rememberScrollState()
+                    )
+                    .padding(
+                        horizontal = 16.dp
+                    )
         ) {
 
+            // ====================================================
+            // НАЗВАНИЕ РЕЦЕПТА
+            // ====================================================
+
             Text(
-
-                text =
-                    recipe.name,
-
+                text = recipe.name,
                 fontSize = 28.sp,
-
-                fontWeight =
-                    FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
 
+            Spacer(
+                modifier =
+                    Modifier.height(8.dp)
+            )
+
+            Text(
+                text = "Базовые цвета рецепта",
+                fontSize = 16.sp,
+                color = Color.Gray
+            )
 
             Spacer(
                 modifier =
                     Modifier.height(16.dp)
             )
 
+            // ====================================================
+            // РЕЖИМЫ
+            // ====================================================
 
             Row(
-
                 modifier =
                     Modifier.fillMaxWidth()
             ) {
 
                 FilterChip(
-
                     selected =
                         mode ==
-                            CalculatorMode.TOTAL_WEIGHT,
+                                CalculatorMode.TOTAL_WEIGHT,
 
                     onClick = {
 
@@ -1494,18 +1520,15 @@ fun RecipeCalculatorScreen(
                     }
                 )
 
-
                 Spacer(
                     modifier =
                         Modifier.width(8.dp)
                 )
 
-
                 FilterChip(
-
                     selected =
                         mode ==
-                            CalculatorMode.NEW_RECIPE,
+                                CalculatorMode.NEW_RECIPE,
 
                     onClick = {
 
@@ -1515,19 +1538,27 @@ fun RecipeCalculatorScreen(
 
                     label = {
 
-                        Text("Новый рецепт")
+                        Text(
+                            "Расчёт по базовым цветам"
+                        )
                     }
                 )
             }
-
 
             Spacer(
                 modifier =
                     Modifier.height(20.dp)
             )
 
+            // ====================================================
+            // РЕЖИМЫ КАЛЬКУЛЯТОРА
+            // ====================================================
 
             when (mode) {
+
+                // =================================================
+                // ОБЩИЙ ВЕС
+                // =================================================
 
                 CalculatorMode.TOTAL_WEIGHT -> {
 
@@ -1554,6 +1585,11 @@ fun RecipeCalculatorScreen(
                             Text("Например: 1000")
                         },
 
+                        suffix = {
+
+                            Text("г")
+                        },
+
                         keyboardOptions =
                             KeyboardOptions(
                                 keyboardType =
@@ -1563,57 +1599,46 @@ fun RecipeCalculatorScreen(
                         singleLine = true
                     )
 
-
                     Spacer(
                         modifier =
                             Modifier.height(24.dp)
                     )
 
-
                     Text(
-
                         text = "Рецепт",
-
                         fontSize = 22.sp,
-
-                        fontWeight =
-                            FontWeight.Bold
+                        fontWeight = FontWeight.Bold
                     )
-
 
                     Spacer(
                         modifier =
                             Modifier.height(12.dp)
                     )
 
-
                     val weight =
                         totalWeight
                             .replace(",", ".")
                             .toDoubleOrNull()
 
-
-                    components.forEach {
+                    components.forEach { component ->
 
                         RecipeCalculatorRow(
 
                             colorName =
-                                it.name,
+                                component.name,
 
                             percent =
-                                it.percent,
+                                component.percent,
 
                             totalWeight =
                                 weight
                         )
-
 
                         Spacer(
                             modifier =
                                 Modifier.height(6.dp)
                         )
                     }
-
 
                     if (weight != null) {
 
@@ -1622,13 +1647,11 @@ fun RecipeCalculatorScreen(
                                 Modifier.height(12.dp)
                         )
 
-
                         Text(
-
                             text =
                                 "Итого: ${
                                     formatWeight(weight)
-                                }",
+                                } г",
 
                             fontSize = 18.sp,
 
@@ -1638,157 +1661,428 @@ fun RecipeCalculatorScreen(
                     }
                 }
 
+                // =================================================
+                // РАСЧЁТ ПО БАЗОВЫМ ЦВЕТАМ
+                // =================================================
 
                 CalculatorMode.NEW_RECIPE -> {
 
                     Text(
-
                         text =
-                            "Введите фактическое количество " +
-                                "каждого базового цвета",
+                            "Расчёт по базовым цветам",
 
-                        fontSize = 16.sp
+                        fontSize = 22.sp,
+
+                        fontWeight =
+                            FontWeight.Bold
                     )
-
 
                     Spacer(
                         modifier =
-                            Modifier.height(12.dp)
+                            Modifier.height(8.dp)
                     )
 
+                    Text(
+                        text =
+                            "Выберите базовый цвет и введите его вес. " +
+                            "Остальные цвета и общий вес будут рассчитаны " +
+                            "по процентам сохранённого рецепта.",
 
-                    components.forEachIndexed {
-                            index,
-                            component ->
+                        fontSize = 14.sp,
 
-                        NewRecipeCalculatorRow(
-
-                            colorName =
-                                component.name,
-
-                            weight =
-                                componentWeights[index],
-
-                            percent =
-                                calculatedPercentages[index],
-
-                            onWeightChange = { value ->
-
-                                componentWeights =
-                                    componentWeights
-                                        .toMutableList()
-                                        .also {
-
-                                            it[index] =
-                                                value
-                                        }
-                            }
-                        )
-
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(6.dp)
-                        )
-                    }
-
-
-                    Spacer(
-                        modifier =
-                            Modifier.height(12.dp)
+                        color = Color.Gray
                     )
-
-
-                    Row(
-
-                        modifier =
-                            Modifier.fillMaxWidth(),
-
-                        horizontalArrangement =
-                            Arrangement.SpaceBetween
-                    ) {
-
-                        Text(
-
-                            text =
-                                "Общий вес",
-
-                            fontSize = 18.sp,
-
-                            fontWeight =
-                                FontWeight.Bold
-                        )
-
-
-                        Text(
-
-                            text =
-                                if (
-                                    calculatedTotalWeight > 0
-                                ) {
-
-                                    formatWeight(
-                                        calculatedTotalWeight
-                                    )
-
-                                } else {
-
-                                    "—"
-                                },
-
-                            fontSize = 18.sp,
-
-                            fontWeight =
-                                FontWeight.Bold
-                        )
-                    }
-
 
                     Spacer(
                         modifier =
                             Modifier.height(16.dp)
                     )
 
+                    // =================================================
+                    // ЦВЕТА
+                    // =================================================
 
-                    if (
-                        calculatedTotalWeight > 0
-                    ) {
+                    components.forEachIndexed {
+                            index,
+                            component ->
 
-                        val totalPercent =
-                            calculatedPercentages.sum()
+                        val isSelected =
+                            selectedComponentIndex == index
 
+                        Column(
+                            modifier =
+                                Modifier.fillMaxWidth()
+                        ) {
 
-                        Text(
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
 
-                            text =
-                                "Сумма процентов: ${
-                                    formatPercent(
-                                        totalPercent
-                                    )
-                                }%",
+                                            selectedComponentIndex =
+                                                index
 
-                            fontSize = 16.sp,
+                                            selectedComponentWeight =
+                                                calculatedWeights[
+                                                    index
+                                                ]
+                                                    ?.let {
+                                                        formatWeight(
+                                                            it
+                                                        )
+                                                    }
+                                                    ?: ""
+                                        }
+                                        .background(
+                                            color =
+                                                if (isSelected) {
 
-                            color =
-                                if (
-                                    kotlin.math.abs(
-                                        totalPercent - 100.0
-                                    ) < 0.01
+                                                    MaterialTheme
+                                                        .colorScheme
+                                                        .primaryContainer
+
+                                                } else {
+
+                                                    Color.Transparent
+                                                },
+
+                                            shape =
+                                                RoundedCornerShape(
+                                                    8.dp
+                                                )
+                                        )
+                                        .padding(
+                                            12.dp
+                                        ),
+
+                                verticalAlignment =
+                                    Alignment.CenterVertically
+                            ) {
+
+                                Column(
+                                    modifier =
+                                        Modifier.weight(1f)
                                 ) {
 
-                                    Color(0xFF2E7D32)
+                                    Text(
+                                        text =
+                                            component.name,
 
-                                } else {
+                                        fontSize = 16.sp,
 
-                                    Color(0xFFC62828)
+                                        fontWeight =
+                                            FontWeight.Bold
+                                    )
+
+                                    Spacer(
+                                        modifier =
+                                            Modifier.height(2.dp)
+                                    )
+
+                                    Text(
+                                        text =
+                                            "Рецепт: ${
+                                                formatPercent(
+                                                    component.percent
+                                                )
+                                            }%",
+
+                                        fontSize = 14.sp,
+
+                                        color =
+                                            MaterialTheme
+                                                .colorScheme
+                                                .primary
+                                    )
                                 }
+
+                                if (isSelected) {
+
+                                    Text(
+                                        text = "✓",
+
+                                        color =
+                                            MaterialTheme
+                                                .colorScheme
+                                                .primary,
+
+                                        fontSize = 22.sp,
+
+                                        fontWeight =
+                                            FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(6.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(
+                        modifier =
+                            Modifier.height(12.dp)
+                    )
+
+                    // =================================================
+                    // ВВОД ВЕСА ВЫБРАННОГО ЦВЕТА
+                    // =================================================
+
+                    if (selectedComponentIndex != null) {
+
+                        val selectedComponent =
+                            components[
+                                selectedComponentIndex!!
+                            ]
+
+                        OutlinedTextField(
+
+                            value =
+                                selectedComponentWeight,
+
+                            onValueChange = {
+
+                                selectedComponentWeight =
+                                    it
+                            },
+
+                            modifier =
+                                Modifier.fillMaxWidth(),
+
+                            label = {
+
+                                Text(
+                                    "Вес: ${selectedComponent.name}"
+                                )
+                            },
+
+                            placeholder = {
+
+                                Text("Например: 100")
+                            },
+
+                            suffix = {
+
+                                Text("г")
+                            },
+
+                            keyboardOptions =
+                                KeyboardOptions(
+                                    keyboardType =
+                                        KeyboardType.Decimal
+                                ),
+
+                            singleLine = true
                         )
+
+                        Spacer(
+                            modifier =
+                                Modifier.height(20.dp)
+                        )
+
+                        // =================================================
+                        // ОБЩИЙ ВЕС
+                        // =================================================
+
+                        if (
+                            calculatedTotalWeight > 0.0
+                        ) {
+
+                            Row(
+                                modifier =
+                                    Modifier.fillMaxWidth(),
+
+                                horizontalArrangement =
+                                    Arrangement.SpaceBetween,
+
+                                verticalAlignment =
+                                    Alignment.CenterVertically
+                            ) {
+
+                                Text(
+                                    text =
+                                        "Общий вес",
+
+                                    fontSize = 20.sp,
+
+                                    fontWeight =
+                                        FontWeight.Bold
+                                )
+
+                                Text(
+                                    text =
+                                        "${
+                                            formatWeight(
+                                                calculatedTotalWeight
+                                            )
+                                        } г",
+
+                                    fontSize = 20.sp,
+
+                                    fontWeight =
+                                        FontWeight.Bold,
+
+                                    color =
+                                        MaterialTheme
+                                            .colorScheme
+                                            .primary
+                                )
+                            }
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(20.dp)
+                            )
+
+                            // =================================================
+                            // РЕЗУЛЬТАТ
+                            // =================================================
+
+                            Text(
+                                text = "Расчёт",
+
+                                fontSize = 20.sp,
+
+                                fontWeight =
+                                    FontWeight.Bold
+                            )
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(10.dp)
+                            )
+
+                            components.forEachIndexed {
+                                    index,
+                                    component ->
+
+                                val calculatedWeight =
+                                    calculatedWeights[
+                                        index
+                                    ]
+
+                                Row(
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                vertical = 6.dp
+                                            ),
+
+                                    verticalAlignment =
+                                        Alignment.CenterVertically
+                                ) {
+
+                                    Column(
+                                        modifier =
+                                            Modifier.weight(1f)
+                                    ) {
+
+                                        Text(
+                                            text =
+                                                component.name,
+
+                                            fontSize = 16.sp,
+
+                                            fontWeight =
+                                                FontWeight.Bold
+                                        )
+
+                                        Text(
+                                            text =
+                                                "${
+                                                    formatPercent(
+                                                        component.percent
+                                                    )
+                                                }%",
+
+                                            fontSize = 14.sp,
+
+                                            color =
+                                                Color.Gray
+                                        )
+                                    }
+
+                                    Text(
+                                        text =
+                                            if (
+                                                calculatedWeight != null
+                                            ) {
+
+                                                "${
+                                                    formatWeight(
+                                                        calculatedWeight
+                                                    )
+                                                } г"
+
+                                            } else {
+
+                                                "—"
+                                            },
+
+                                        fontSize = 17.sp,
+
+                                        fontWeight =
+                                            FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(12.dp)
+                            )
+
+                            // =================================================
+                            // ПРОВЕРКА
+                            // =================================================
+
+                            Row(
+                                modifier =
+                                    Modifier.fillMaxWidth(),
+
+                                horizontalArrangement =
+                                    Arrangement.SpaceBetween
+                            ) {
+
+                                Text(
+                                    text =
+                                        "Сумма процентов",
+
+                                    fontSize = 16.sp
+                                )
+
+                                Text(
+                                    text =
+                                        "${
+                                            formatPercent(
+                                                recipeTotalPercent
+                                            )
+                                        }%",
+
+                                    fontSize = 16.sp,
+
+                                    fontWeight =
+                                        FontWeight.Bold
+                                )
+                            }
+                        }
                     }
                 }
             }
+
+            Spacer(
+                modifier =
+                    Modifier.height(24.dp)
+            )
         }
     }
 }
+
+
 
 
 /* ============================================================
@@ -2009,6 +2303,7 @@ fun PantoneColorCard(
             try {
 
                 Color(
+
                     android.graphics.Color.parseColor(
                         color.hexCode
                     )
